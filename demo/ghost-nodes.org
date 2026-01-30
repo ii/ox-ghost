@@ -1,9 +1,9 @@
-#+TITLE: ox-ghost: The Complete Reference
+#+TITLE: Ghost Nodes: The Complete Reference
 #+AUTHOR: ii.coop
 #+DATE: 2026-01-29
 #+DESCRIPTION: A self-documenting guide to every Ghost Lexical node type with org-mode source examples
 
-#+GHOST_SLUG: org-ghost-reference
+#+GHOST_SLUG: ghost-nodes
 #+GHOST_TYPE: post
 #+GHOST_STATUS: draft
 #+GHOST_VISIBILITY: public

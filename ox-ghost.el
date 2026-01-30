@@ -504,7 +504,7 @@ Styles:
     (mode . "normal")))
 
 (defun ox-ghost--plain-list (plain-list contents info)
-  "Transcode PLAIN-LIST."
+  "Transcode PLAIN-LIST to nested Lexical list structure."
   (let* ((list-type (if (eq (org-element-property :type plain-list) 'ordered)
                         "number" "bullet"))
          (items (ox-ghost--parse-block-nodes contents)))
@@ -518,15 +518,19 @@ Styles:
       `(tag . ,(if (string= list-type "number") "ol" "ul")))))
 
 (defun ox-ghost--item (item contents info)
-  "Transcode list ITEM."
-  (let* ((children (ox-ghost--parse-children contents))
-         (counter (or (org-element-property :counter item) 1)))
+  "Transcode list ITEM. Nested lists stay as children."
+  (let* ((checkbox (org-element-property :checkbox item))
+         (counter (or (org-element-property :counter item) 1))
+         (children (ox-ghost--parse-block-nodes contents)))
     (ox-ghost--node "listitem"
-      `(children . ,children)
+      `(children . ,(vconcat children))
       '(direction . "ltr")
       '(format . "")
       '(indent . 0)
-      `(value . ,counter))))
+      `(value . ,counter)
+      `(checked . ,(cond ((eq checkbox 'on) t)
+                         ((eq checkbox 'off) :json-false)
+                         (t nil))))))
 
 (defun ox-ghost--quote-block (quote-block contents info)
   "Transcode QUOTE-BLOCK."

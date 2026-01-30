@@ -1,0 +1,17 @@
+{
+  "title": "Ghost Nodes: The Complete Reference",
+  "slug": "ghost-nodes",
+  "type": "post",
+  "status": "draft",
+  "visibility": "public",
+  "tags": [
+    "ox-ghost",
+    "org-mode",
+    "ghost",
+    "reference",
+    "documentation"
+  ],
+  "author": "ii.coop",
+  "date": "2026-01-29",
+  "excerpt": "A self-documenting guide to every Ghost Lexical node type with org-mode source examples. See the rendered result, then click to view the org-mode code that produces it."
+}
