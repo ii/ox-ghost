@@ -93,6 +93,77 @@ If nil, metadata will use names instead of IDs."
 (defconst ox-ghost--format-underline 8)
 (defconst ox-ghost--format-code 16)
 
+;; Common emoji shortcodes used in Ghost callouts
+(defconst ox-ghost--emoji-map
+  '(("bulb" . "💡")
+    ("light_bulb" . "💡")
+    ("warning" . "⚠️")
+    ("exclamation" . "❗")
+    ("question" . "❓")
+    ("info" . "ℹ️")
+    ("information_source" . "ℹ️")
+    ("white_check_mark" . "✅")
+    ("check" . "✅")
+    ("x" . "❌")
+    ("cross_mark" . "❌")
+    ("star" . "⭐")
+    ("fire" . "🔥")
+    ("rocket" . "🚀")
+    ("tada" . "🎉")
+    ("sparkles" . "✨")
+    ("heart" . "❤️")
+    ("thumbsup" . "👍")
+    ("thumbsdown" . "👎")
+    ("eyes" . "👀")
+    ("memo" . "📝")
+    ("pencil" . "✏️")
+    ("book" . "📖")
+    ("link" . "🔗")
+    ("lock" . "🔒")
+    ("key" . "🔑")
+    ("gear" . "⚙️")
+    ("wrench" . "🔧")
+    ("hammer" . "🔨")
+    ("zap" . "⚡")
+    ("boom" . "💥")
+    ("bug" . "🐛")
+    ("robot" . "🤖")
+    ("unicorn" . "🦄")
+    ("speech_balloon" . "💬")
+    ("thought_balloon" . "💭")
+    ("email" . "📧")
+    ("package" . "📦")
+    ("gift" . "🎁")
+    ("trophy" . "🏆")
+    ("medal" . "🏅")
+    ("target" . "🎯")
+    ("dart" . "🎯")
+    ("alarm_clock" . "⏰")
+    ("hourglass" . "⏳")
+    ("calendar" . "📅")
+    ("art" . "🎨")
+    ("palette" . "🎨")
+    ("paintbrush" . "🖌️")
+    ("computer" . "💻")
+    ("desktop" . "🖥️")
+    ("keyboard" . "⌨️")
+    ("mouse" . "🖱️")
+    ("cloud" . "☁️")
+    ("sun" . "☀️")
+    ("moon" . "🌙")
+    ("earth" . "🌍")
+    ("globe" . "🌐"))
+  "Map of emoji shortcodes to actual emoji characters.")
+
+(defun ox-ghost--emoji (name)
+  "Convert emoji NAME (shortcode or emoji) to actual emoji.
+If NAME is already an emoji, return it unchanged.
+If NAME is a shortcode, look it up in `ox-ghost--emoji-map'."
+  (if (or (null name) (string-empty-p name))
+      "💡"  ; default
+    (or (cdr (assoc name ox-ghost--emoji-map))
+        name)))  ; return as-is if not found (might already be emoji)
+
 ;;; Define the backend
 
 (org-export-define-backend 'ghost
@@ -337,7 +408,7 @@ Styles:
          (concat
           (funcall encode-nodes code-nodes)
           (ox-ghost--node "callout"
-            `(calloutEmoji . ,(or (plist-get attr :emoji) "📤"))
+            `(calloutEmoji . ,(ox-ghost--emoji (or (plist-get attr :emoji) "📤")))
             `(calloutText . ,output-text)
             `(backgroundColor . ,(or (plist-get attr :color) "grey"))))))
       ("toggle"
@@ -583,7 +654,7 @@ Styles:
     (cond
      ((string= type "CALLOUT")
       (ox-ghost--node "callout"
-        `(calloutEmoji . ,(or (plist-get attr :emoji) "💡"))
+        `(calloutEmoji . ,(ox-ghost--emoji (or (plist-get attr :emoji) "bulb")))
         `(calloutText . ,text)
         `(backgroundColor . ,(or (plist-get attr :color) "blue"))))
      ((string= type "TOGGLE")
