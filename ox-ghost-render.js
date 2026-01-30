@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// ox-lexical-render.js - Render and validate Lexical JSON using Ghost's renderer
+// ox-ghost-render.js - Render and validate Lexical JSON using Ghost's renderer
 //
-// Part of ox-lexical: https://github.com/ii-coop/ox-lexical
+// Part of ox-ghost: https://github.com/ii-coop/ox-ghost
 //
 // Usage:
-//   ox-lexical-render input.json              # Validate JSON
-//   ox-lexical-render input.json --html out   # Render to HTML
-//   ox-lexical-render input.org --html out    # Export org → JSON → HTML
+//   ox-ghost-render input.json              # Validate JSON
+//   ox-ghost-render input.json --html out   # Render to HTML
+//   ox-ghost-render input.org --html out    # Export org → JSON → HTML
 //
 // Requires: npm install @tryghost/kg-lexical-html-renderer @tryghost/kg-default-nodes
 
@@ -18,11 +18,11 @@ async function main() {
 
   if (args.length < 1 || args.includes('--help') || args.includes('-h')) {
     console.log(`
-ox-lexical-render - Render and validate Lexical JSON using Ghost's renderer
+ox-ghost-render - Render and validate Lexical JSON using Ghost's renderer
 
 Usage:
-  ox-lexical-render input.json [options]
-  ox-lexical-render input.org [options]    # exports org first, then renders
+  ox-ghost-render input.json [options]
+  ox-ghost-render input.org [options]    # exports org first, then renders
 
 Options:
   --html FILE    Render to HTML and save to FILE
@@ -30,10 +30,10 @@ Options:
   --help         Show this help
 
 Examples:
-  ox-lexical-render export.json                    # Validate only
-  ox-lexical-render export.json --html preview.html
-  ox-lexical-render doc.org --html preview.html    # Full pipeline
-  ox-lexical-render export.json --quiet            # JSON stats for scripts
+  ox-ghost-render export.json                    # Validate only
+  ox-ghost-render export.json --html preview.html
+  ox-ghost-render doc.org --html preview.html    # Full pipeline
+  ox-ghost-render export.json --quiet            # JSON stats for scripts
 
 Exit codes:
   0  Success (valid Lexical JSON)
@@ -52,7 +52,7 @@ Exit codes:
   if (inputFile && inputFile.endsWith('.org')) {
     const jsonFile = inputFile.replace(/\.org$/, '.json');
     const scriptDir = __dirname;
-    const exportScript = path.join(scriptDir, 'org-to-lexical.sh');
+    const exportScript = path.join(scriptDir, 'ox-ghost-export.sh');
 
     if (!quiet) console.log(`Exporting ${inputFile} to JSON...`);
 

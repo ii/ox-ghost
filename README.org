@@ -1,10 +1,10 @@
-#+TITLE: ox-lexical: Org-mode to Ghost Lexical JSON Exporter
+#+TITLE: ox-ghost: Org-mode to Ghost Lexical JSON Exporter
 #+AUTHOR: ii.coop
 #+DATE: 2026-01-28
 
 * Overview
 
-=ox-lexical= is an Emacs org-mode export backend that converts org files to
+=ox-ghost= is an Emacs org-mode export backend that converts org files to
 Ghost's Lexical JSON format, enabling direct publishing to Ghost CMS.
 
 * Installation
@@ -14,7 +14,7 @@ Ghost's Lexical JSON format, enabling direct publishing to Ghost CMS.
 Load the elisp file in Emacs:
 
 #+BEGIN_SRC elisp
-(load "/path/to/ox-lexical/ox-lexical.el")
+(load "/path/to/ox-ghost/ox-ghost.el")
 #+END_SRC
 
 ** Node.js Validator (optional)
@@ -22,7 +22,7 @@ Load the elisp file in Emacs:
 For local validation with Ghost's renderer:
 
 #+BEGIN_SRC bash
-cd /path/to/ox-lexical
+cd /path/to/ox-ghost
 npm install
 #+END_SRC
 
@@ -46,7 +46,7 @@ npm install
 emacs --batch -Q \
   --eval "(require 'org)" \
   --eval "(require 'ox-html)" \
-  -l ox-lexical.el \
+  -l ox-ghost.el \
   --visit input.org \
   --eval "(princ (org-export-as 'lexical))"
 #+END_SRC
@@ -407,7 +407,7 @@ Ghost Koenig editor supports these node types (from [[https://github.com/TryGhos
 
 | File                 | Purpose                                    |
 |----------------------+--------------------------------------------|
-| =ox-lexical.el=      | Emacs org-mode export backend              |
+| =ox-ghost.el=      | Emacs org-mode export backend              |
 | =org-to-lexical.sh=  | Shell wrapper for batch export             |
 | =validate-lexical.js= | Validation with Ghost's renderer          |
 | =package.json=       | npm dependencies for validator             |
@@ -420,7 +420,7 @@ Ghost Koenig editor supports these node types (from [[https://github.com/TryGhos
 - Added bundled Ghost renderer for local validation
 - Added =validate-lexical.js= tool
 - Added =STYLE-GUIDE.org= authoring guide
-- Renamed module to =ox-lexical=
+- Renamed module to =ox-ghost=
 
 ** 0.5.0 (2026-01-29)
 - Added REPL block for code + output with 5 styles (simple, labeled, callout, toggle, aside)

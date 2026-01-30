@@ -1,20 +1,20 @@
-#+TITLE: ox-lexical: The Complete Reference
+#+TITLE: ox-ghost: The Complete Reference
 #+AUTHOR: ii.coop
 #+DATE: 2026-01-29
 #+DESCRIPTION: A self-documenting guide to every Ghost Lexical node type with org-mode source examples
 
-#+GHOST_SLUG: ox-lexical-reference
+#+GHOST_SLUG: org-ghost-reference
 #+GHOST_TYPE: post
 #+GHOST_STATUS: draft
 #+GHOST_VISIBILITY: public
-#+GHOST_TAGS: ox-lexical, org-mode, ghost, reference, documentation
+#+GHOST_TAGS: ox-ghost, org-mode, ghost, reference, documentation
 #+GHOST_EXCERPT: A self-documenting guide to every Ghost Lexical node type with org-mode source examples. See the rendered result, then click to view the org-mode code that produces it.
 
 #+PROPERTY: header-args :eval never-export
 
 * Introduction
 
-This is a *self-documenting reference* for ox-lexical, the Emacs org-mode export
+This is a *self-documenting reference* for ox-ghost, the Emacs org-mode export
 backend that converts =.org= files to Ghost's Lexical JSON format.
 
 Every section shows:
@@ -272,7 +272,7 @@ print(hello("Ghost"))
 
 ** More Languages
 
-#+BEGIN_SRC javascript
+#+BEGIN_SRC js
 // JavaScript
 const greet = (name) => `Hello, ${name}!`;
 console.log(greet("World"));
@@ -465,6 +465,34 @@ Split layout:
 ,#+END_SIGNUP
 #+END_SRC
 #+END_TOGGLE
+
+* Email-Only Content
+
+Content that only appears in newsletter emails, not on the web post.
+
+#+BEGIN_CALLOUT :emoji "📧" :color grey
+The EMAIL block below will only be visible to newsletter subscribers.
+It won't appear on the website version of this post.
+#+END_CALLOUT
+
+#+BEGIN_EMAIL
+<p>Thanks for being a subscriber! Here's exclusive content just for you.</p>
+<p>This paragraph only appears in the <strong>email version</strong> of this post.</p>
+#+END_EMAIL
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_EMAIL
+<p>Thanks for being a subscriber!</p>
+<p>This only appears in the <strong>email version</strong>.</p>
+,#+END_EMAIL
+#+END_SRC
+#+END_TOGGLE
+
+#+BEGIN_CALLOUT :emoji "💡" :color blue
+Use EMAIL blocks for subscriber-exclusive content, special offers,
+or personalized messages that don't belong on the public web version.
+#+END_CALLOUT
 
 * Call to Action (CTA)
 
@@ -781,7 +809,7 @@ When Lexical nodes aren't enough, embed raw HTML.
 
 Insert raw Lexical JSON directly (advanced).
 
-This is useful for nodes ox-lexical doesn't yet support.
+This is useful for nodes ox-ghost doesn't yet support.
 
 #+BEGIN_TOGGLE :heading "Org Source"
 #+BEGIN_SRC org
@@ -800,7 +828,7 @@ Create your content using the patterns shown above.
 ** Step 2: Export to Lexical JSON
 
 #+BEGIN_SRC bash
-cd /path/to/ox-lexical
+cd /path/to/ox-ghost
 ./org-to-lexical.sh input.org output.json
 #+END_SRC
 
@@ -842,15 +870,50 @@ M-x ghost-publish-enrich-buffer
 
 This probes each media URL and adds the metadata attributes.
 
+* Membership Paywall
+
+The PAYWALL block marks where free content ends and members-only content begins.
+
+#+BEGIN_CALLOUT :emoji "🔒" :color grey
+Everything below this paywall is only visible to paying members.
+Free readers will see a signup prompt instead.
+#+END_CALLOUT
+
+#+BEGIN_PAYWALL
+#+END_PAYWALL
+
+** 🎉 Secret Members-Only Content
+
+Congratulations! You've unlocked the exclusive members-only section.
+
+#+BEGIN_CALLOUT :emoji "🦄" :color purple
+*You found the unicorn!* This content is hidden behind the paywall.
+Only paying members can see it. Feel special.
+#+END_CALLOUT
+
+Here's what free readers are missing:
+- The meaning of life: *42*
+- The best programming language: *the one that pays your bills*
+- The secret to happiness: *good coffee and clean code*
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_PAYWALL
+,#+END_PAYWALL
+
+Content after the paywall is members-only.
+#+END_SRC
+#+END_TOGGLE
+
 * Download This Document
 
 This post is self-documenting. Download the source files:
 
-#+BEGIN_FILE :src "https://www.ii.coop/content/files/2026/01/ox-lexical-reference.org" :fileName "ox-lexical-reference.org"
+#+BEGIN_FILE :src "https://www.ii.coop/content/files/2026/01/ox-ghost-reference.org" :fileName "ox-ghost-reference.org"
 Org-mode Source (the file that generated this post)
 #+END_FILE
 
-#+BEGIN_FILE :src "https://www.ii.coop/content/files/2026/01/ox-lexical-reference.json" :fileName "ox-lexical-reference.json"
+#+BEGIN_FILE :src "https://www.ii.coop/content/files/2026/01/ox-ghost-reference.json" :fileName "ox-ghost-reference.json"
 Lexical JSON Output (what Ghost renders)
 #+END_FILE
 
@@ -872,8 +935,9 @@ and create your own posts using the same pipeline.
 | Media     | Image (3 widths), Video, Audio, Gallery, File, Embed  |
 | Ghost     | Header (3 sizes), Signup (3 layouts), CTA (3 layouts) |
 | Product   | Product Card                                          |
+| Newsletter| Email (email-only content), Paywall (members-only)    |
 | Special   | REPL (5 styles), Raw HTML, Raw Lexical                |
 
-#+BEGIN_CTA :layout minimal :buttonText "View on GitHub" :url "https://github.com/ii-org/ox-lexical"
-ox-lexical is open source. Contributions welcome!
+#+BEGIN_CTA :layout minimal :buttonText "View on GitHub" :url "https://github.com/ii-org/ox-ghost"
+ox-ghost is open source. Contributions welcome!
 #+END_CTA

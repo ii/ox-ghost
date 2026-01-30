@@ -1,4 +1,4 @@
-;;; ox-lexical.el --- Export org-mode to Ghost Lexical JSON -*- lexical-binding: t; -*-
+;;; ox-ghost.el --- Export org-mode to Ghost Ghost Lexical JSON -*- lexical-binding: t; -*-
 
 ;; Author: ii.coop
 ;; Version: 0.7.0
@@ -7,7 +7,7 @@
 
 ;;; Commentary:
 
-;; Export org-mode documents to Ghost's Lexical JSON format.
+;; Export org-mode documents to Ghost's Ghost Lexical JSON format.
 ;;
 ;; Strategy: Transcoders return JSON strings wrapped with markers.
 ;; The template transcoder collects and assembles the final JSON.
@@ -43,88 +43,86 @@
 
 ;;; Customization
 
-(defgroup ox-lexical nil
-  "Options for exporting Org files to Ghost Lexical JSON."
+(defgroup ox-ghost nil
+  "Options for exporting Org files to Ghost Ghost Lexical JSON."
   :tag "Org Lexical"
   :group 'org-export)
 
-(defcustom ox-lexical-renderer-path nil
-  "Path to ox-lexical-render.js.
-If nil, searches in the same directory as `ox-lexical.el'."
+(defcustom ox-ghost-renderer-path nil
+  "Path to ox-ghost-render.js.
+If nil, searches in the same directory as `ox-ghost.el'."
   :type '(choice (const :tag "Auto-detect" nil)
                  (file :tag "Custom path"))
-  :group 'ox-lexical)
+  :group 'ox-ghost)
 
-(defcustom ox-lexical-node-command
-  (or (executable-find "node")
-      "/home/linuxbrew/.linuxbrew/bin/node"
-      "node")
+(defcustom ox-ghost-node-command
+  (or (executable-find "node") "node")
   "Command to run Node.js.
-Defaults to the result of `executable-find' or common paths."
+Defaults to the result of `executable-find' or \"node\"."
   :type 'string
-  :group 'ox-lexical)
+  :group 'ox-ghost)
 
-(defconst ox-lexical--directory
+(defconst ox-ghost--directory
   (file-name-directory (or load-file-name buffer-file-name))
-  "Directory where ox-lexical is installed.
+  "Directory where ox-ghost is installed.
 Captured at load time to find the renderer script.")
 
-(defcustom ox-lexical-ghost-defaults nil
+(defcustom ox-ghost-ghost-defaults nil
   "Default Ghost metadata for posts/pages.
 Alist of (PROPERTY . VALUE) pairs. Can be set in .dir-locals.el.
 Example: ((type . \"post\") (status . \"draft\") (visibility . \"public\"))"
   :type '(alist :key-type symbol :value-type string)
-  :group 'ox-lexical)
+  :group 'ox-ghost)
 
-(defcustom ox-lexical-ghost-config nil
+(defcustom ox-ghost-ghost-config nil
   "Path to ghost-config.json for resolving tier/newsletter names to IDs.
 If nil, metadata will use names instead of IDs."
   :type '(choice (const :tag "None" nil)
                  (file :tag "Config file path"))
-  :group 'ox-lexical)
+  :group 'ox-ghost)
 
 ;;; Constants
 
-(defconst ox-lexical--node-marker "‹LEXNODE›"
+(defconst ox-ghost--node-marker "‹LEXNODE›"
   "Marker to separate JSON node strings.")
 
 ;;; Format flags (bitmask)
-(defconst ox-lexical--format-bold 1)
-(defconst ox-lexical--format-italic 2)
-(defconst ox-lexical--format-strikethrough 4)
-(defconst ox-lexical--format-underline 8)
-(defconst ox-lexical--format-code 16)
+(defconst ox-ghost--format-bold 1)
+(defconst ox-ghost--format-italic 2)
+(defconst ox-ghost--format-strikethrough 4)
+(defconst ox-ghost--format-underline 8)
+(defconst ox-ghost--format-code 16)
 
 ;;; Define the backend
 
-(org-export-define-backend 'lexical
-  '((headline . ox-lexical--headline)
-    (section . ox-lexical--section)
-    (paragraph . ox-lexical--paragraph)
-    (plain-text . ox-lexical--plain-text)
-    (bold . ox-lexical--bold)
-    (italic . ox-lexical--italic)
-    (underline . ox-lexical--underline)
-    (strike-through . ox-lexical--strike-through)
-    (code . ox-lexical--code)
-    (verbatim . ox-lexical--verbatim)
-    (link . ox-lexical--link)
-    (plain-list . ox-lexical--plain-list)
-    (item . ox-lexical--item)
-    (quote-block . ox-lexical--quote-block)
-    (src-block . ox-lexical--src-block)
-    (example-block . ox-lexical--example-block)
-    (fixed-width . ox-lexical--fixed-width)
-    (export-block . ox-lexical--export-block)
-    (special-block . ox-lexical--special-block)
-    (horizontal-rule . ox-lexical--horizontal-rule)
-    (table . ox-lexical--table)
-    (template . ox-lexical--template)
-    (inner-template . ox-lexical--inner-template)
-    (line-break . ox-lexical--line-break)
-    (entity . ox-lexical--entity))
+(org-export-define-backend 'ghost
+  '((headline . ox-ghost--headline)
+    (section . ox-ghost--section)
+    (paragraph . ox-ghost--paragraph)
+    (plain-text . ox-ghost--plain-text)
+    (bold . ox-ghost--bold)
+    (italic . ox-ghost--italic)
+    (underline . ox-ghost--underline)
+    (strike-through . ox-ghost--strike-through)
+    (code . ox-ghost--code)
+    (verbatim . ox-ghost--verbatim)
+    (link . ox-ghost--link)
+    (plain-list . ox-ghost--plain-list)
+    (item . ox-ghost--item)
+    (quote-block . ox-ghost--quote-block)
+    (src-block . ox-ghost--src-block)
+    (example-block . ox-ghost--example-block)
+    (fixed-width . ox-ghost--fixed-width)
+    (export-block . ox-ghost--export-block)
+    (special-block . ox-ghost--special-block)
+    (horizontal-rule . ox-ghost--horizontal-rule)
+    (table . ox-ghost--table)
+    (template . ox-ghost--template)
+    (inner-template . ox-ghost--inner-template)
+    (line-break . ox-ghost--line-break)
+    (entity . ox-ghost--entity))
   :menu-entry
-  '(?x "Export to Lexical (Ghost)"
+  '(?x "Export to Ghost (Ghost)"
        ((?x "As JSON buffer" org-lexical-export-as-json)
         (?j "To JSON file" org-lexical-export-to-file)
         (?g "For Ghost (JSON + metadata)" org-lexical-export-for-ghost)
@@ -135,24 +133,24 @@ If nil, metadata will use names instead of IDs."
 
 ;;; Node constructors - return JSON strings
 
-(defun ox-lexical--node (type &rest props)
+(defun ox-ghost--node (type &rest props)
   "Create a JSON node string of TYPE with PROPS."
   (let ((node `((type . ,type) (version . 1) ,@props)))
-    (concat ox-lexical--node-marker (json-encode node))))
+    (concat ox-ghost--node-marker (json-encode node))))
 
-(defun ox-lexical--text-node (text &optional format-val)
+(defun ox-ghost--text-node (text &optional format-val)
   "Create text node JSON."
-  (ox-lexical--node "text"
+  (ox-ghost--node "text"
     `(text . ,text)
     `(format . ,(or format-val 0))
     '(style . "")
     '(detail . 0)
     '(mode . "normal")))
 
-(defun ox-lexical--para-node (children-json)
+(defun ox-ghost--para-node (children-json)
   "Create paragraph node JSON with CHILDREN-JSON."
-  (let ((children (ox-lexical--parse-children children-json)))
-    (ox-lexical--node "paragraph"
+  (let ((children (ox-ghost--parse-children children-json)))
+    (ox-ghost--node "paragraph"
       `(children . ,children)
       '(direction . "ltr")
       '(format . "")
@@ -160,10 +158,10 @@ If nil, metadata will use names instead of IDs."
       '(textFormat . 0)
       '(textStyle . ""))))
 
-(defun ox-lexical--heading-node (level children-json)
+(defun ox-ghost--heading-node (level children-json)
   "Create heading node JSON."
-  (let ((children (ox-lexical--parse-children children-json)))
-    (ox-lexical--node "heading"
+  (let ((children (ox-ghost--parse-children children-json)))
+    (ox-ghost--node "heading"
       `(tag . ,(format "h%d" (min level 6)))
       `(children . ,children)
       '(direction . "ltr")
@@ -172,12 +170,12 @@ If nil, metadata will use names instead of IDs."
 
 ;;; Helpers
 
-(defun ox-lexical--parse-children (content)
+(defun ox-ghost--parse-children (content)
   "Parse CONTENT string into vector of child nodes.
 Handles post-blank spaces that appear between JSON nodes."
   (if (or (null content) (string-empty-p content))
       []
-    (let* ((parts (split-string content ox-lexical--node-marker t))
+    (let* ((parts (split-string content ox-ghost--node-marker t))
            (nodes '())
            (pending-space nil))
       (dolist (part parts)
@@ -203,11 +201,11 @@ Handles post-blank spaces that appear between JSON nodes."
           (setcdr (assoc 'text (car nodes)) (concat txt pending-space))))
       (vconcat (nreverse nodes)))))
 
-(defun ox-lexical--parse-block-nodes (content)
+(defun ox-ghost--parse-block-nodes (content)
   "Parse CONTENT into list of block-level nodes."
   (if (or (null content) (string-empty-p content))
       '()
-    (let* ((parts (split-string content ox-lexical--node-marker t))
+    (let* ((parts (split-string content ox-ghost--node-marker t))
            (nodes (mapcar (lambda (part)
                             (condition-case nil
                                 (json-read-from-string part)
@@ -215,7 +213,7 @@ Handles post-blank spaces that appear between JSON nodes."
                           parts)))
       (delq nil nodes))))
 
-(defun ox-lexical--render-to-html (element)
+(defun ox-ghost--render-to-html (element)
   "Render ELEMENT's contents to HTML for toggle/callout bodies.
 Uses org's HTML exporter to convert nested content to HTML.
 Post-processes code blocks to use Prism.js format for consistent styling."
@@ -242,11 +240,11 @@ Post-processes code blocks to use Prism.js format for consistent styling."
           html)
       "")))
 
-(defun ox-lexical--extract-text (content)
+(defun ox-ghost--extract-text (content)
   "Extract plain text from CONTENT for card bodies."
   (if (or (null content) (string-empty-p content))
       ""
-    (let* ((nodes (ox-lexical--parse-block-nodes content))
+    (let* ((nodes (ox-ghost--parse-block-nodes content))
            (texts (mapcar (lambda (node)
                             (let ((type (cdr (assoc 'type node))))
                               (cond
@@ -266,7 +264,7 @@ Post-processes code blocks to use Prism.js format for consistent styling."
                           nodes)))
       (string-trim (mapconcat #'identity texts "\n")))))
 
-(defun ox-lexical--parse-params (params)
+(defun ox-ghost--parse-params (params)
   "Parse block PARAMS string into plist.
 Handles URLs with colons and multi-word values properly."
   (when (and params (not (string-empty-p params)))
@@ -289,7 +287,7 @@ Handles URLs with colons and multi-word values properly."
           (setq pos (match-end 0))))
       result)))
 
-(defun ox-lexical--gallery-node (attr contents)
+(defun ox-ghost--gallery-node (attr contents)
   "Create gallery node from ATTR and CONTENTS (images extracted from links)."
   (let* ((images-raw (split-string (or (plist-get attr :images) "") "," t "[ \t\n]+"))
          (images (mapcar (lambda (src)
@@ -297,11 +295,11 @@ Handles URLs with colons and multi-word values properly."
                              (caption . "")
                              (alt . "")))
                          images-raw)))
-    (ox-lexical--node "gallery"
+    (ox-ghost--node "gallery"
       `(images . ,(vconcat images))
       `(caption . ""))))
 
-(defun ox-lexical--repl-block (attr contents info)
+(defun ox-ghost--repl-block (attr contents info)
   "Render REPL block with style from ATTR.
 Styles:
   simple  - pass through contents (default)
@@ -311,7 +309,7 @@ Styles:
   aside   - wrap all in aside block"
   (let* ((style (or (plist-get attr :style) "simple"))
          (label (or (plist-get attr :label) "Output"))
-         (children (ox-lexical--parse-block-nodes contents))
+         (children (ox-ghost--parse-block-nodes contents))
          (is-code-p (lambda (n)
                       (and (string= (cdr (assoc 'type n)) "codeblock")
                            (not (string= (cdr (assoc 'language n)) "text")))))
@@ -324,21 +322,21 @@ Styles:
          (code-lang (when first-code (cdr (assoc 'language first-code))))
          (encode-nodes (lambda (nodes)
                          (mapconcat (lambda (n)
-                                      (concat ox-lexical--node-marker (json-encode n)))
+                                      (concat ox-ghost--node-marker (json-encode n)))
                                     nodes ""))))
     (pcase style
       ("simple" contents)
       ("labeled"
        (concat
         (funcall encode-nodes code-nodes)
-        (ox-lexical--para-node (ox-lexical--text-node (concat label ":")))
+        (ox-ghost--para-node (ox-ghost--text-node (concat label ":")))
         (funcall encode-nodes output-nodes)))
       ("callout"
        (let ((output-text (mapconcat (lambda (n) (or (cdr (assoc 'code n)) ""))
                                      output-nodes "\n")))
          (concat
           (funcall encode-nodes code-nodes)
-          (ox-lexical--node "callout"
+          (ox-ghost--node "callout"
             `(calloutEmoji . ,(or (plist-get attr :emoji) "📤"))
             `(calloutText . ,output-text)
             `(backgroundColor . ,(or (plist-get attr :color) "grey"))))))
@@ -348,22 +346,22 @@ Styles:
               (code-text (mapconcat (lambda (n) (or (cdr (assoc 'code n)) ""))
                                     code-nodes "\n")))
          (concat
-          (ox-lexical--node "toggle" `(heading . ,heading) `(content . ,code-text))
+          (ox-ghost--node "toggle" `(heading . ,heading) `(content . ,code-text))
           (funcall encode-nodes output-nodes))))
       ("aside"
-       (ox-lexical--node "aside"
+       (ox-ghost--node "aside"
          `(children . ,(vconcat children))
          '(direction . "ltr")
          '(format . "")
          '(indent . 0)))
       (_ contents))))
 
-(defun ox-lexical--image-node (src desc link)
+(defun ox-ghost--image-node (src desc link)
   "Create image node from SRC, DESC, and LINK element."
   (let* ((alt-text (or desc ""))
          (parent (org-element-property :parent link))
          (attrs (when parent (org-export-read-attribute :attr_lexical parent))))
-    (ox-lexical--node "image"
+    (ox-ghost--node "image"
       `(src . ,src)
       `(alt . ,alt-text)
       `(caption . "")
@@ -375,9 +373,9 @@ Styles:
 
 ;;; Transcoders
 
-(defun ox-lexical--template (contents info)
+(defun ox-ghost--template (contents info)
   "Wrap CONTENTS in Lexical root structure."
-  (let* ((nodes (ox-lexical--parse-block-nodes contents))
+  (let* ((nodes (ox-ghost--parse-block-nodes contents))
          (root `((root . ((type . "root")
                           (version . 1)
                           (children . ,(vconcat nodes))
@@ -386,69 +384,69 @@ Styles:
                           (indent . 0))))))
     (json-encode root)))
 
-(defun ox-lexical--inner-template (contents info)
+(defun ox-ghost--inner-template (contents info)
   "Return CONTENTS."
   (or contents ""))
 
-(defun ox-lexical--section (section contents info)
+(defun ox-ghost--section (section contents info)
   "Transcode SECTION - pass through."
   (or contents ""))
 
-(defun ox-lexical--headline (headline contents info)
+(defun ox-ghost--headline (headline contents info)
   "Transcode HEADLINE."
   (let* ((level (1+ (org-element-property :level headline)))
          (title (org-element-property :raw-value headline))
-         (heading (ox-lexical--heading-node level (ox-lexical--text-node title))))
+         (heading (ox-ghost--heading-node level (ox-ghost--text-node title))))
     (concat heading (or contents ""))))
 
-(defun ox-lexical--paragraph (paragraph contents info)
+(defun ox-ghost--paragraph (paragraph contents info)
   "Transcode PARAGRAPH."
   (if (and contents (not (string-empty-p (string-trim contents))))
       (let ((parent-type (org-element-type (org-element-property :parent paragraph))))
         ;; Don't wrap if inside item (list handles it)
         (if (eq parent-type 'item)
             contents
-          (ox-lexical--para-node contents)))
+          (ox-ghost--para-node contents)))
     ""))
 
-(defun ox-lexical--plain-text (text info)
+(defun ox-ghost--plain-text (text info)
   "Transcode plain TEXT, preserving surrounding whitespace."
   ;; Collapse internal whitespace/newlines but preserve leading/trailing
   (let* ((collapsed (replace-regexp-in-string "[ \t]*\n[ \t]*" " " text))
          (clean (replace-regexp-in-string "[ \t]+" " " collapsed)))
     (if (string-empty-p clean)
         ""
-      (ox-lexical--text-node clean))))
+      (ox-ghost--text-node clean))))
 
-(defun ox-lexical--bold (bold contents info)
+(defun ox-ghost--bold (bold contents info)
   "Transcode BOLD."
-  (ox-lexical--apply-format contents ox-lexical--format-bold))
+  (ox-ghost--apply-format contents ox-ghost--format-bold))
 
-(defun ox-lexical--italic (italic contents info)
+(defun ox-ghost--italic (italic contents info)
   "Transcode ITALIC."
-  (ox-lexical--apply-format contents ox-lexical--format-italic))
+  (ox-ghost--apply-format contents ox-ghost--format-italic))
 
-(defun ox-lexical--underline (underline contents info)
+(defun ox-ghost--underline (underline contents info)
   "Transcode UNDERLINE."
-  (ox-lexical--apply-format contents ox-lexical--format-underline))
+  (ox-ghost--apply-format contents ox-ghost--format-underline))
 
-(defun ox-lexical--strike-through (strike contents info)
+(defun ox-ghost--strike-through (strike contents info)
   "Transcode STRIKE-THROUGH."
-  (ox-lexical--apply-format contents ox-lexical--format-strikethrough))
+  (ox-ghost--apply-format contents ox-ghost--format-strikethrough))
 
-(defun ox-lexical--code (code contents info)
+(defun ox-ghost--code (code contents info)
   "Transcode inline CODE."
-  (ox-lexical--text-node (org-element-property :value code) ox-lexical--format-code))
+  (ox-ghost--text-node (org-element-property :value code) ox-ghost--format-code))
 
-(defun ox-lexical--verbatim (verbatim contents info)
+(defun ox-ghost--verbatim (verbatim contents info)
   "Transcode VERBATIM."
-  (ox-lexical--text-node (org-element-property :value verbatim) ox-lexical--format-code))
+  (ox-ghost--text-node (org-element-property :value verbatim) ox-ghost--format-code))
 
-(defun ox-lexical--apply-format (contents flag)
+(defun ox-ghost--apply-format (contents flag)
   "Apply format FLAG to text nodes in CONTENTS."
   (if (or (null contents) (string-empty-p contents))
       ""
-    (let* ((parts (split-string contents ox-lexical--node-marker t))
+    (let* ((parts (split-string contents ox-ghost--node-marker t))
            (updated (mapcar
                      (lambda (part)
                        (condition-case nil
@@ -457,29 +455,29 @@ Styles:
                              (if (string= type "text")
                                  (let ((fmt (or (cdr (assoc 'format node)) 0)))
                                    (setcdr (assoc 'format node) (logior fmt flag))
-                                   (concat ox-lexical--node-marker (json-encode node)))
-                               (concat ox-lexical--node-marker part)))
-                         (error (concat ox-lexical--node-marker part))))
+                                   (concat ox-ghost--node-marker (json-encode node)))
+                               (concat ox-ghost--node-marker part)))
+                         (error (concat ox-ghost--node-marker part))))
                      parts)))
       (mapconcat #'identity updated ""))))
 
-(defun ox-lexical--link (link contents info)
+(defun ox-ghost--link (link contents info)
   "Transcode LINK."
   (let* ((type (org-element-property :type link))
          (path (org-element-property :path link))
          (raw-link (org-element-property :raw-link link))
-         (desc (if contents (ox-lexical--extract-text contents) path)))
+         (desc (if contents (ox-ghost--extract-text contents) path)))
     (cond
      ;; Images (file:// local paths)
      ((and (string= type "file")
            (member (downcase (or (file-name-extension path) ""))
                    '("png" "jpg" "jpeg" "gif" "webp" "svg")))
-      (ox-lexical--image-node path desc link))
+      (ox-ghost--image-node path desc link))
      ;; Images (http/https URLs)
      ((and (member type '("http" "https"))
            (member (downcase (or (file-name-extension path) ""))
                    '("png" "jpg" "jpeg" "gif" "webp" "svg")))
-      (ox-lexical--image-node (concat type ":" path) desc link))
+      (ox-ghost--image-node (concat type ":" path) desc link))
      ;; Regular links
      (t
       (let ((url (cond
@@ -487,15 +485,15 @@ Styles:
                   ((string= type "file") path)
                   (t raw-link)))
             (link-text (or desc path)))
-        (ox-lexical--node "link"
+        (ox-ghost--node "link"
           `(url . ,url)
-          `(children . ,(vector (ox-lexical--text-node-alist link-text)))
+          `(children . ,(vector (ox-ghost--text-node-alist link-text)))
           '(direction . "ltr")
           '(format . "")
           '(indent . 0)
           '(rel . "noopener")))))))
 
-(defun ox-lexical--text-node-alist (text &optional format-val)
+(defun ox-ghost--text-node-alist (text &optional format-val)
   "Return text node as alist (not JSON string)."
   `((type . "text")
     (version . 1)
@@ -505,12 +503,12 @@ Styles:
     (detail . 0)
     (mode . "normal")))
 
-(defun ox-lexical--plain-list (plain-list contents info)
+(defun ox-ghost--plain-list (plain-list contents info)
   "Transcode PLAIN-LIST."
   (let* ((list-type (if (eq (org-element-property :type plain-list) 'ordered)
                         "number" "bullet"))
-         (items (ox-lexical--parse-block-nodes contents)))
-    (ox-lexical--node "list"
+         (items (ox-ghost--parse-block-nodes contents)))
+    (ox-ghost--node "list"
       `(listType . ,list-type)
       `(children . ,(vconcat items))
       '(direction . "ltr")
@@ -519,99 +517,99 @@ Styles:
       '(start . 1)
       `(tag . ,(if (string= list-type "number") "ol" "ul")))))
 
-(defun ox-lexical--item (item contents info)
+(defun ox-ghost--item (item contents info)
   "Transcode list ITEM."
-  (let* ((children (ox-lexical--parse-children contents))
+  (let* ((children (ox-ghost--parse-children contents))
          (counter (or (org-element-property :counter item) 1)))
-    (ox-lexical--node "listitem"
+    (ox-ghost--node "listitem"
       `(children . ,children)
       '(direction . "ltr")
       '(format . "")
       '(indent . 0)
       `(value . ,counter))))
 
-(defun ox-lexical--quote-block (quote-block contents info)
+(defun ox-ghost--quote-block (quote-block contents info)
   "Transcode QUOTE-BLOCK."
-  (let ((children (ox-lexical--parse-children contents)))
-    (ox-lexical--node "quote"
+  (let ((children (ox-ghost--parse-children contents)))
+    (ox-ghost--node "quote"
       `(children . ,children)
       '(direction . "ltr")
       '(format . "")
       '(indent . 0))))
 
-(defun ox-lexical--src-block (src-block contents info)
+(defun ox-ghost--src-block (src-block contents info)
   "Transcode SRC-BLOCK."
   (let ((code (org-element-property :value src-block))
         (lang (or (org-element-property :language src-block) "")))
-    (ox-lexical--node "codeblock"
+    (ox-ghost--node "codeblock"
       `(code . ,code)
       `(language . ,lang))))
 
-(defun ox-lexical--example-block (example-block contents info)
+(defun ox-ghost--example-block (example-block contents info)
   "Transcode EXAMPLE-BLOCK."
   (let ((code (org-element-property :value example-block)))
-    (ox-lexical--node "codeblock"
+    (ox-ghost--node "codeblock"
       `(code . ,code)
       '(language . "text"))))
 
-(defun ox-lexical--fixed-width (fixed-width contents info)
+(defun ox-ghost--fixed-width (fixed-width contents info)
   "Transcode FIXED-WIDTH (lines starting with :)."
   (let ((code (org-element-property :value fixed-width)))
-    (ox-lexical--node "codeblock"
+    (ox-ghost--node "codeblock"
       `(code . ,code)
       '(language . "text"))))
 
-(defun ox-lexical--export-block (export-block contents info)
+(defun ox-ghost--export-block (export-block contents info)
   "Transcode EXPORT-BLOCK."
   (let ((type (upcase (org-element-property :type export-block)))
         (value (org-element-property :value export-block)))
     (cond
      ((string= type "HTML")
-      (ox-lexical--node "html" `(html . ,value)))
+      (ox-ghost--node "html" `(html . ,value)))
      ((string= type "LEXICAL")
-      (concat ox-lexical--node-marker value))
+      (concat ox-ghost--node-marker value))
      (t ""))))
 
-(defun ox-lexical--special-block (special-block contents info)
+(defun ox-ghost--special-block (special-block contents info)
   "Transcode SPECIAL-BLOCK."
   (let* ((type (upcase (org-element-property :type special-block)))
          (params (org-element-property :parameters special-block))
-         (attr (ox-lexical--parse-params params))
-         (text (ox-lexical--extract-text contents)))
+         (attr (ox-ghost--parse-params params))
+         (text (ox-ghost--extract-text contents)))
     (cond
      ((string= type "CALLOUT")
-      (ox-lexical--node "callout"
+      (ox-ghost--node "callout"
         `(calloutEmoji . ,(or (plist-get attr :emoji) "💡"))
         `(calloutText . ,text)
         `(backgroundColor . ,(or (plist-get attr :color) "blue"))))
      ((string= type "TOGGLE")
       ;; Toggle content supports HTML - render inner content as HTML
-      (let ((html-content (ox-lexical--render-to-html special-block)))
-        (ox-lexical--node "toggle"
+      (let ((html-content (ox-ghost--render-to-html special-block)))
+        (ox-ghost--node "toggle"
           `(heading . ,(or (plist-get attr :heading) ""))
           `(content . ,html-content))))
      ((string= type "ASIDE")
-      (let ((children (ox-lexical--parse-children contents)))
-        (ox-lexical--node "aside"
+      (let ((children (ox-ghost--parse-children contents)))
+        (ox-ghost--node "aside"
           `(children . ,children)
           '(direction . "ltr")
           '(format . "")
           '(indent . 0))))
      ((string= type "BUTTON")
-      (ox-lexical--node "button"
+      (ox-ghost--node "button"
         `(buttonText . ,text)
         `(buttonUrl . ,(or (plist-get attr :url) ""))
         `(alignment . ,(or (plist-get attr :alignment) "center"))))
      ((string= type "HEADER")
-      (ox-lexical--node "header"
+      (ox-ghost--node "header"
         `(size . ,(or (plist-get attr :size) "small"))
         `(header . ,text)))
      ((string= type "SIGNUP")
-      (ox-lexical--node "signup"
+      (ox-ghost--node "signup"
         `(layout . ,(or (plist-get attr :layout) "regular"))
         `(buttonText . ,(or (plist-get attr :buttonText) "Subscribe"))))
      ((string= type "CTA")
-      (ox-lexical--node "call-to-action"
+      (ox-ghost--node "call-to-action"
         `(layout . ,(or (plist-get attr :layout) "minimal"))
         `(buttonText . ,(or (plist-get attr :buttonText) "Learn more"))
         `(buttonUrl . ,(or (plist-get attr :url) ""))
@@ -624,17 +622,20 @@ Styles:
           (push `(thumbnail . ,(plist-get attr :thumbnail)) metadata))
         (when (plist-get attr :icon)
           (push `(icon . ,(plist-get attr :icon)) metadata))
-        (ox-lexical--node "bookmark"
+        (ox-ghost--node "bookmark"
           `(url . ,(or (plist-get attr :url) ""))
           `(metadata . ,metadata))))
      ((string= type "EMAIL")
-      (ox-lexical--node "email"
+      (ox-ghost--node "email"
         `(html . ,text)))
+     ((string= type "PAYWALL")
+      ;; Paywall is just a marker - content below is members-only
+      (ox-ghost--node "paywall"))
      ((string= type "TRANSISTOR")
-      (ox-lexical--node "transistor"
+      (ox-ghost--node "transistor"
         `(episodeUrl . ,(or (plist-get attr :url) ""))))
      ((string= type "VIDEO")
-      (ox-lexical--node "video"
+      (ox-ghost--node "video"
         `(src . ,(or (plist-get attr :src) ""))
         `(caption . ,(or text ""))
         `(width . ,(plist-get attr :width))
@@ -645,29 +646,29 @@ Styles:
         `(customThumbnail . ,(or (plist-get attr :customThumbnail) ""))
         `(loop . :json-false)))
      ((string= type "AUDIO")
-      (ox-lexical--node "audio"
+      (ox-ghost--node "audio"
         `(src . ,(or (plist-get attr :src) ""))
         `(title . ,(or text ""))
         `(duration . ,(plist-get attr :duration))
         `(mimeType . ,(or (plist-get attr :mimeType) ""))))
      ((string= type "EMBED")
       ;; Include html directly in node creation (can't modify string afterward)
-      (ox-lexical--node "embed"
+      (ox-ghost--node "embed"
         `(url . ,(or (plist-get attr :url) ""))
         `(embedType . "url")
         `(metadata . ((title . ,text)))
         `(html . ,(or (plist-get attr :html) ""))))
      ((string= type "GALLERY")
-      (ox-lexical--gallery-node attr contents))
+      (ox-ghost--gallery-node attr contents))
      ((string= type "FILE")
-      (ox-lexical--node "file"
+      (ox-ghost--node "file"
         `(src . ,(or (plist-get attr :src) ""))
         `(title . ,text)
         `(caption . "")
         `(fileName . ,(or (plist-get attr :fileName) ""))
         `(fileSize . nil)))
      ((string= type "PRODUCT")
-      (ox-lexical--node "product"
+      (ox-ghost--node "product"
         `(productTitle . ,text)
         `(productDescription . "")
         `(productUrl . ,(or (plist-get attr :url) ""))
@@ -676,16 +677,16 @@ Styles:
      ;; REPL block: wrap source + output with configurable style
      ;; Styles: simple (default), labeled, callout, toggle, aside
      ((string= type "REPL")
-      (ox-lexical--repl-block attr contents info))
+      (ox-ghost--repl-block attr contents info))
      (t
-      (ox-lexical--node "html"
+      (ox-ghost--node "html"
         `(html . ,(format "<!-- Unknown: %s -->\n%s" type text)))))))
 
-(defun ox-lexical--horizontal-rule (hr contents info)
+(defun ox-ghost--horizontal-rule (hr contents info)
   "Transcode HORIZONTAL-RULE."
-  (ox-lexical--node "horizontalrule"))
+  (ox-ghost--node "horizontalrule"))
 
-(defun ox-lexical--table (table contents info)
+(defun ox-ghost--table (table contents info)
   "Transcode TABLE to HTML node.
 Handles errors gracefully by returning a placeholder instead of crashing."
   (condition-case err
@@ -694,24 +695,24 @@ Handles errors gracefully by returning a placeholder instead of crashing."
                          (org-element-property :end table)))
              (html (org-export-string-as table-str 'html t '(:with-toc nil))))
         (if (and html (stringp html) (not (string-empty-p (string-trim html))))
-            (ox-lexical--node "html" `(html . ,(string-trim html)))
+            (ox-ghost--node "html" `(html . ,(string-trim html)))
           ;; Empty result - return placeholder
-          (ox-lexical--node "html"
+          (ox-ghost--node "html"
             `(html . ,(format "<!-- Table export returned empty result -->\n<pre>%s</pre>"
-                              (ox-lexical--escape-html table-str))))))
+                              (ox-ghost--escape-html table-str))))))
     (error
      ;; On error, log a warning and return a visible placeholder
-     (message "ox-lexical: Table export failed: %S" err)
+     (message "ox-ghost: Table export failed: %S" err)
      (let ((table-str (ignore-errors
                         (buffer-substring-no-properties
                          (org-element-property :begin table)
                          (org-element-property :end table)))))
-       (ox-lexical--node "html"
+       (ox-ghost--node "html"
          `(html . ,(format "<!-- Table export error: %s -->\n<pre>%s</pre>"
                            (error-message-string err)
-                           (ox-lexical--escape-html (or table-str "[table content unavailable]")))))))))
+                           (ox-ghost--escape-html (or table-str "[table content unavailable]")))))))))
 
-(defun ox-lexical--escape-html (str)
+(defun ox-ghost--escape-html (str)
   "Escape HTML special characters in STR for safe embedding."
   (when str
     (replace-regexp-in-string
@@ -722,18 +723,18 @@ Handles errors gracefully by returning a placeholder instead of crashing."
        ">" "&gt;"
        (replace-regexp-in-string "\"" "&quot;" str))))))
 
-(defun ox-lexical--line-break (lb contents info)
+(defun ox-ghost--line-break (lb contents info)
   "Transcode LINE-BREAK to Lexical linebreak node.
 In Lexical, linebreaks are their own node type, not \\n in text."
-  (ox-lexical--node "linebreak"))
+  (ox-ghost--node "linebreak"))
 
-(defun ox-lexical--entity (entity contents info)
+(defun ox-ghost--entity (entity contents info)
   "Transcode ENTITY."
-  (ox-lexical--text-node (org-element-property :utf-8 entity)))
+  (ox-ghost--text-node (org-element-property :utf-8 entity)))
 
 ;;; Ghost Metadata Extraction
 
-(defun ox-lexical--get-ghost-property (key)
+(defun ox-ghost--get-ghost-property (key)
   "Get GHOST_KEY property from current org buffer.
 Returns nil if not found."
   (save-excursion
@@ -742,12 +743,12 @@ Returns nil if not found."
       (when (re-search-forward prop-re nil t)
         (string-trim (match-string 1))))))
 
-(defun ox-lexical--parse-comma-list (str)
+(defun ox-ghost--parse-comma-list (str)
   "Parse comma-separated STR into list of trimmed strings."
   (when str
     (mapcar #'string-trim (split-string str "," t "\\s-*"))))
 
-(defun ox-lexical--get-org-keyword (key)
+(defun ox-ghost--get-org-keyword (key)
   "Get #+KEY value from current org buffer."
   (save-excursion
     (goto-char (point-min))
@@ -755,65 +756,65 @@ Returns nil if not found."
       (when (re-search-forward prop-re nil t)
         (string-trim (match-string 1))))))
 
-(defun ox-lexical--slugify (title)
+(defun ox-ghost--slugify (title)
   "Convert TITLE to a URL-friendly slug."
   (let ((slug (downcase title)))
     (setq slug (replace-regexp-in-string "[^a-z0-9]+" "-" slug))
     (setq slug (replace-regexp-in-string "^-+\\|-+$" "" slug))
     slug))
 
-(defun ox-lexical-extract-metadata ()
+(defun ox-ghost-extract-metadata ()
   "Extract Ghost metadata from current org buffer.
-Merges org properties with `ox-lexical-ghost-defaults'."
-  (let* ((defaults ox-lexical-ghost-defaults)
-         (title (or (ox-lexical--get-org-keyword "title") "Untitled"))
+Merges org properties with `ox-ghost-ghost-defaults'."
+  (let* ((defaults ox-ghost-ghost-defaults)
+         (title (or (ox-ghost--get-org-keyword "title") "Untitled"))
          (metadata
           `((title . ,title)
-            (slug . ,(or (ox-lexical--get-ghost-property "slug")
+            (slug . ,(or (ox-ghost--get-ghost-property "slug")
                          (alist-get 'slug defaults)
-                         (ox-lexical--slugify title)))
-            (type . ,(or (ox-lexical--get-ghost-property "type")
+                         (ox-ghost--slugify title)))
+            (type . ,(or (ox-ghost--get-ghost-property "type")
                          (alist-get 'type defaults)
                          "post"))
-            (status . ,(or (ox-lexical--get-ghost-property "status")
+            (status . ,(or (ox-ghost--get-ghost-property "status")
                            (alist-get 'status defaults)
                            "draft"))
-            (visibility . ,(or (ox-lexical--get-ghost-property "visibility")
+            (visibility . ,(or (ox-ghost--get-ghost-property "visibility")
                                (alist-get 'visibility defaults)
                                "public"))
-            (featured . ,(let ((val (ox-lexical--get-ghost-property "featured")))
+            (featured . ,(let ((val (ox-ghost--get-ghost-property "featured")))
                            (and val (member val '("t" "true" "yes" "1")))))
-            (tags . ,(or (ox-lexical--parse-comma-list
-                          (ox-lexical--get-ghost-property "tags"))
+            (tags . ,(or (ox-ghost--parse-comma-list
+                          (ox-ghost--get-ghost-property "tags"))
                          (alist-get 'tags defaults)))
-            (tiers . ,(ox-lexical--parse-comma-list
-                       (ox-lexical--get-ghost-property "tiers")))
-            (author . ,(or (ox-lexical--get-org-keyword "author")
+            (tiers . ,(ox-ghost--parse-comma-list
+                       (ox-ghost--get-ghost-property "tiers")))
+            (author . ,(or (ox-ghost--get-org-keyword "author")
                            (alist-get 'author defaults)))
-            (date . ,(ox-lexical--get-org-keyword "date"))
-            (excerpt . ,(or (ox-lexical--get-ghost-property "excerpt")
-                            (ox-lexical--get-org-keyword "description")))
-            (feature_image . ,(ox-lexical--get-ghost-property "image"))
-            (feature_image_alt . ,(ox-lexical--get-ghost-property "image_alt"))
-            (newsletter . ,(or (ox-lexical--get-ghost-property "newsletter")
+            (date . ,(ox-ghost--get-org-keyword "date"))
+            (excerpt . ,(or (ox-ghost--get-ghost-property "excerpt")
+                            (ox-ghost--get-org-keyword "description")))
+            (feature_image . ,(ox-ghost--get-ghost-property "image"))
+            (feature_image_alt . ,(ox-ghost--get-ghost-property "image_alt"))
+            (newsletter . ,(or (ox-ghost--get-ghost-property "newsletter")
                                (alist-get 'newsletter defaults)))
-            (email_subject . ,(ox-lexical--get-ghost-property "email_subject"))
-            (email_segment . ,(ox-lexical--get-ghost-property "email_segment"))
-            (canonical_url . ,(ox-lexical--get-ghost-property "canonical"))
-            (meta_title . ,(ox-lexical--get-ghost-property "meta_title"))
-            (meta_description . ,(ox-lexical--get-ghost-property "meta_description"))
-            (og_title . ,(ox-lexical--get-ghost-property "og_title"))
-            (og_description . ,(ox-lexical--get-ghost-property "og_description"))
-            (og_image . ,(ox-lexical--get-ghost-property "og_image"))
-            (twitter_title . ,(ox-lexical--get-ghost-property "twitter_title"))
-            (twitter_description . ,(ox-lexical--get-ghost-property "twitter_description"))
-            (twitter_image . ,(ox-lexical--get-ghost-property "twitter_image"))
-            (codeinjection_head . ,(ox-lexical--get-ghost-property "head"))
-            (codeinjection_foot . ,(ox-lexical--get-ghost-property "foot")))))
+            (email_subject . ,(ox-ghost--get-ghost-property "email_subject"))
+            (email_segment . ,(ox-ghost--get-ghost-property "email_segment"))
+            (canonical_url . ,(ox-ghost--get-ghost-property "canonical"))
+            (meta_title . ,(ox-ghost--get-ghost-property "meta_title"))
+            (meta_description . ,(ox-ghost--get-ghost-property "meta_description"))
+            (og_title . ,(ox-ghost--get-ghost-property "og_title"))
+            (og_description . ,(ox-ghost--get-ghost-property "og_description"))
+            (og_image . ,(ox-ghost--get-ghost-property "og_image"))
+            (twitter_title . ,(ox-ghost--get-ghost-property "twitter_title"))
+            (twitter_description . ,(ox-ghost--get-ghost-property "twitter_description"))
+            (twitter_image . ,(ox-ghost--get-ghost-property "twitter_image"))
+            (codeinjection_head . ,(ox-ghost--get-ghost-property "head"))
+            (codeinjection_foot . ,(ox-ghost--get-ghost-property "foot")))))
     ;; Remove nil values
     (cl-remove-if (lambda (pair) (null (cdr pair))) metadata)))
 
-(defun ox-lexical-write-metadata (metadata file)
+(defun ox-ghost-write-metadata (metadata file)
   "Write METADATA alist to FILE as JSON."
   (with-temp-file file
     (insert (json-encode metadata))
@@ -824,10 +825,10 @@ Merges org properties with `ox-lexical-ghost-defaults'."
 
 ;;;###autoload
 (defun org-lexical-export-as-json (&optional async subtreep visible-only body-only ext-plist)
-  "Export current buffer to Lexical JSON buffer.
+  "Export current buffer to Ghost Lexical JSON buffer.
 The buffer is pretty-printed and uses `json-mode' if available."
   (interactive)
-  (org-export-to-buffer 'lexical "*Org Lexical Export*"
+  (org-export-to-buffer 'ghost "*Org Lexical Export*"
     async subtreep visible-only body-only ext-plist
     (lambda ()
       ;; Pretty-print the JSON
@@ -848,24 +849,24 @@ The buffer is pretty-printed and uses `json-mode' if available."
 
 ;;;###autoload
 (defun org-lexical-export-to-file (&optional async subtreep visible-only body-only ext-plist)
-  "Export current buffer to Lexical JSON file."
+  "Export current buffer to Ghost Lexical JSON file."
   (interactive)
   (let ((outfile (org-export-output-file-name ".json")))
-    (org-export-to-file 'lexical outfile
+    (org-export-to-file 'ghost outfile
       async subtreep visible-only body-only ext-plist)))
 
 ;;; Node.js Renderer Integration
 
-(defun ox-lexical--renderer-path ()
-  "Return path to ox-lexical-render.js.
-Uses `ox-lexical-renderer-path' if set, otherwise the package directory."
-  (or ox-lexical-renderer-path
-      (expand-file-name "ox-lexical-render.js" ox-lexical--directory)))
+(defun ox-ghost--renderer-path ()
+  "Return path to ox-ghost-render.js.
+Uses `ox-ghost-renderer-path' if set, otherwise the package directory."
+  (or ox-ghost-renderer-path
+      (expand-file-name "ox-ghost-render.js" ox-ghost--directory)))
 
-(defun ox-lexical--ensure-dependencies ()
+(defun ox-ghost--ensure-dependencies ()
   "Ensure Node.js dependencies are installed.
 Prompts to run npm install if node_modules is missing."
-  (let* ((renderer (ox-lexical--renderer-path))
+  (let* ((renderer (ox-ghost--renderer-path))
          (dir (file-name-directory renderer))
          (node-modules (expand-file-name "node_modules" dir))
          (package-json (expand-file-name "package.json" dir)))
@@ -887,13 +888,13 @@ Prompts to run npm install if node_modules is missing."
                 (error "npm install failed:\n%s" output))))
         (error "Cannot render without dependencies.\nRun: cd %s && npm install" dir)))))
 
-(defun ox-lexical--run-renderer (json-file &optional html-file quiet)
+(defun ox-ghost--run-renderer (json-file &optional html-file quiet)
   "Run the Node.js renderer on JSON-FILE.
 If HTML-FILE is provided, generate HTML output.
 If QUIET is non-nil, only return stats.
 Automatically prompts to install dependencies if missing."
-  (ox-lexical--ensure-dependencies)
-  (let* ((renderer (ox-lexical--renderer-path))
+  (ox-ghost--ensure-dependencies)
+  (let* ((renderer (ox-ghost--renderer-path))
          (args (list json-file))
          (cmd nil))
     (when html-file
@@ -901,13 +902,13 @@ Automatically prompts to install dependencies if missing."
     (when quiet
       (setq args (append args (list "--quiet"))))
     (setq cmd (mapconcat #'shell-quote-argument
-                         (cons ox-lexical-node-command (cons renderer args))
+                         (cons ox-ghost-node-command (cons renderer args))
                          " "))
     (shell-command-to-string cmd)))
 
 ;;;###autoload
 (defun org-lexical-export-to-html (&optional async subtreep visible-only body-only ext-plist)
-  "Export current buffer to HTML via Lexical JSON.
+  "Export current buffer to HTML via Ghost Lexical JSON.
 First exports to JSON, then renders to HTML using Ghost's renderer.
 ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, EXT-PLIST are passed to the exporter."
   (interactive)
@@ -915,10 +916,10 @@ ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, EXT-PLIST are passed to the exporter."
   (let* ((json-file (org-export-output-file-name ".json"))
          (html-file (org-export-output-file-name ".html")))
     ;; Export to JSON first (synchronously)
-    (org-export-to-file 'lexical json-file
+    (org-export-to-file 'ghost json-file
       nil subtreep visible-only body-only ext-plist)
     ;; Then render to HTML
-    (let ((output (ox-lexical--run-renderer json-file html-file)))
+    (let ((output (ox-ghost--run-renderer json-file html-file)))
       (message "Exported: %s\n%s" html-file (string-trim output)))
     html-file))
 
@@ -932,7 +933,7 @@ ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, EXT-PLIST are passed to the exporter."
 
 ;;;###autoload
 (defun org-lexical-validate (&optional async subtreep visible-only body-only ext-plist)
-  "Validate Lexical JSON using Ghost's renderer.
+  "Validate Ghost Lexical JSON using Ghost's renderer.
 When called interactively, prompts for a JSON file.
 When called from export menu, validates the default output file.
 ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, EXT-PLIST are ignored."
@@ -942,7 +943,7 @@ ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, EXT-PLIST are ignored."
                         (read-file-name "JSON file to validate: "
                                         nil default-file t default-file)
                       default-file))
-         (output (ox-lexical--run-renderer json-file nil nil)))
+         (output (ox-ghost--run-renderer json-file nil nil)))
     (ignore async subtreep visible-only body-only ext-plist)
     (with-current-buffer (get-buffer-create "*Lexical Validation*")
       (erase-buffer)
@@ -952,7 +953,7 @@ ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, EXT-PLIST are ignored."
 
 ;;;###autoload
 (defun org-lexical-export-for-ghost (&optional async subtreep visible-only body-only ext-plist)
-  "Export current buffer to Lexical JSON and metadata.json for Ghost.
+  "Export current buffer to Ghost Lexical JSON and metadata.json for Ghost.
 Creates both <name>.json (content) and <name>-metadata.json (Ghost properties).
 ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, EXT-PLIST are passed to the exporter."
   (interactive)
@@ -960,12 +961,12 @@ ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, EXT-PLIST are passed to the exporter."
   (let* ((base-name (file-name-sans-extension (buffer-file-name)))
          (json-file (concat base-name ".json"))
          (meta-file (concat base-name "-metadata.json"))
-         (metadata (ox-lexical-extract-metadata)))
-    ;; Export Lexical JSON
-    (org-export-to-file 'lexical json-file
+         (metadata (ox-ghost-extract-metadata)))
+    ;; Export Ghost Lexical JSON
+    (org-export-to-file 'ghost json-file
       nil subtreep visible-only body-only ext-plist)
     ;; Write metadata
-    (ox-lexical-write-metadata metadata meta-file)
+    (ox-ghost-write-metadata metadata meta-file)
     (message "Exported:\n  Content: %s\n  Metadata: %s\n  Slug: %s"
              (file-name-nondirectory json-file)
              (file-name-nondirectory meta-file)
@@ -976,7 +977,7 @@ ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, EXT-PLIST are passed to the exporter."
 (defun org-lexical-show-metadata ()
   "Display extracted Ghost metadata for current buffer."
   (interactive)
-  (let ((metadata (ox-lexical-extract-metadata)))
+  (let ((metadata (ox-ghost-extract-metadata)))
     (with-current-buffer (get-buffer-create "*Ghost Metadata*")
       (erase-buffer)
       (insert (json-encode metadata))
@@ -985,5 +986,5 @@ ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, EXT-PLIST are passed to the exporter."
       (when (fboundp 'json-mode) (json-mode))
       (display-buffer (current-buffer)))))
 
-(provide 'ox-lexical)
-;;; ox-lexical.el ends here
+(provide 'ox-ghost)
+;;; ox-ghost.el ends here

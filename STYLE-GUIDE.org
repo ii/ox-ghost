@@ -5,7 +5,7 @@
 * Introduction
 
 This guide captures best practices for writing org-mode documents that export
-beautifully to Ghost via the ox-lexical exporter.
+beautifully to Ghost via the ox-ghost exporter.
 
 Lexical documents are a *flat list of nodes* - headings don't contain content,
 they're just styled markers. Understanding this helps you structure content

@@ -7,13 +7,13 @@
 #+GHOST_TYPE: post
 #+GHOST_STATUS: draft
 #+GHOST_VISIBILITY: public
-#+GHOST_TAGS: ox-lexical, testing, emacs
+#+GHOST_TAGS: ox-ghost, testing, emacs
 #+GHOST_FEATURED: false
-#+GHOST_EXCERPT: Testing the ox-lexical export with full Ghost metadata support.
+#+GHOST_EXCERPT: Testing the ox-ghost export with full Ghost metadata support.
 
 * Introduction
 
-This is a test document for the ~ox-lexical~ Ghost metadata export feature.
+This is a test document for the ~ox-ghost~ Ghost metadata export feature.
 
 ** Features Being Tested
 
@@ -27,7 +27,7 @@ This is a test document for the ~ox-lexical~ Ghost metadata export feature.
 Here's a simple example:
 
 #+begin_src elisp
-(message "Hello from ox-lexical!")
+(message "Hello from ox-ghost!")
 #+end_src
 
 * Conclusion

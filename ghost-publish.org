@@ -16,7 +16,7 @@ This library provides a complete workflow for publishing org-mode files to Ghost
 * Installation
 
 #+BEGIN_SRC elisp
-(add-to-list 'load-path "/srv/research/org/ox-lexical")
+(add-to-list 'load-path "/srv/research/org/ox-ghost")
 (require 'ghost-publish)
 
 ;; Configure Ghost connection

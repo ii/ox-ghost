@@ -7,7 +7,7 @@
 #+GHOST_TYPE: post
 #+GHOST_STATUS: draft
 #+GHOST_VISIBILITY: public
-#+GHOST_TAGS: org-mode, ghost, tutorial, ox-lexical
+#+GHOST_TAGS: org-mode, ghost, tutorial, ox-ghost
 #+GHOST_EXCERPT: Discover how org-mode transforms into beautiful Ghost posts—with dynamically generated media.
 
 #+PROPERTY: header-args :eval never-export
@@ -287,7 +287,7 @@ org-mode.org
     ├─→ ffmpeg produces video
     ├─→ ghost.js uploads media
     │
-    ▼  ox-lexical exports to JSON
+    ▼  ox-ghost exports to JSON
     │
     ▼  enrich-lexical.js
     │  (fetches oEmbed, video metadata)

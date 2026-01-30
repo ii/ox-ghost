@@ -1,17 +1,17 @@
-;;; ghost-publish.el --- Publish org-mode to Ghost CMS -*- lexical-binding: t; -*-
+;;; ox-ghost-publish.el --- Publish org-mode to Ghost CMS -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026 ii.coop
 ;; Author: ii.coop
-;; Version: 0.1.0
-;; Package-Requires: ((emacs "27.1"))
-;; Keywords: org, ghost, publishing
+;; Version: 0.2.0
+;; Package-Requires: ((emacs "27.1") (ox-ghost "0.8.0"))
+;; Keywords: org, ghost, lexical, publishing
 
 ;;; Commentary:
 
 ;; Provides a complete workflow for publishing org-mode files to Ghost CMS.
 ;; Separates concerns into: Generate → Enrich → Preview → Publish
 ;;
-;; See ghost-publish.org for full documentation.
+;; Part of the ox-ghost package.
 
 ;;; Code:
 
@@ -26,14 +26,18 @@
   :group 'org
   :prefix "ghost-publish-")
 
-(defcustom ghost-publish-url "https://www.ii.coop"
-  "Ghost site URL."
-  :type 'string
+(defcustom ghost-publish-url nil
+  "Ghost site URL (e.g., \"https://your-site.ghost.io\").
+Must be set before publishing."
+  :type '(choice (const :tag "Not set" nil)
+                 (string :tag "URL"))
   :group 'ghost-publish)
 
-(defcustom ghost-publish-script "/srv/ii.coop/ghost.js"
-  "Path to ghost.js CLI script."
-  :type 'string
+(defcustom ghost-publish-script nil
+  "Path to ox-ghost.js CLI script.
+If nil, looks for ox-ghost.js in the ox-ghost directory."
+  :type '(choice (const :tag "Auto-detect" nil)
+                 (file :tag "Custom path"))
   :group 'ghost-publish)
 
 (defcustom ghost-publish-temp-dir nil
@@ -41,7 +45,23 @@
   :type '(choice (const nil) string)
   :group 'ghost-publish)
 
+(defconst ghost-publish--directory
+  (file-name-directory (or load-file-name buffer-file-name))
+  "Directory where ghost-publish is installed.")
+
 ;;;; Utility Functions
+
+(defun ghost-publish--find-script ()
+  "Find ox-ghost.js script path.
+Checks `ghost-publish-script', then the package directory."
+  (or ghost-publish-script
+      (let ((local (expand-file-name "ox-ghost.js" ghost-publish--directory)))
+        (when (file-exists-p local) local))
+      (error "ox-ghost.js not found. Set `ghost-publish-script'")))
+
+(defun ghost-publish--script-dir ()
+  "Get directory containing ox-ghost.js."
+  (file-name-directory (ghost-publish--find-script)))
 
 (defun ghost-publish--temp-dir ()
   "Get or create temporary directory."
@@ -55,8 +75,8 @@
 (defun ghost-publish--upload-file (file)
   "Upload FILE to Ghost, return URL."
   (let ((output (ghost-publish--run-command
-                 (format "cd %s && node ghost.js upload %s 2>&1 | grep -o 'https://[^ ]*'"
-                         (file-name-directory ghost-publish-script)
+                 (format "cd %s && node ox-ghost.js upload %s 2>&1 | grep -o 'https://[^ ]*'"
+                         (ghost-publish--script-dir)
                          (shell-quote-argument file)))))
     (if (string-prefix-p "https://" output)
         output
@@ -371,7 +391,7 @@ Point should be on the line to modify."
          (json-file (concat (file-name-sans-extension org-file) ".json"))
          (html-file (concat (file-name-sans-extension org-file) ".html")))
     ;; Export to Lexical JSON
-    (require 'ox-lexical)
+    (require 'ox-ghost)
     (org-lexical-export-to-file)
     ;; Convert to HTML (using ghost renderer or simple conversion)
     (ghost-publish--json-to-html json-file html-file)
@@ -421,7 +441,7 @@ Point should be on the line to modify."
 (defun ghost-preview-json ()
   "Export to Lexical JSON and display in buffer."
   (interactive)
-  (require 'ox-lexical)
+  (require 'ox-ghost)
   (let* ((json-file (org-lexical-export-to-file)))
     (find-file-other-window json-file)
     (json-pretty-print-buffer)
@@ -442,12 +462,12 @@ TITLE defaults to #+TITLE value."
                     (file-name-base org-file)))
          (json-file (concat (file-name-sans-extension org-file) ".json")))
     ;; Export to Lexical JSON
-    (require 'ox-lexical)
+    (require 'ox-ghost)
     (org-lexical-export-to-file)
     ;; Publish via ghost.js
     (let ((output (ghost-publish--run-command
-                   (format "cd %s && node ghost.js post create %s %s 2>&1"
-                           (file-name-directory ghost-publish-script)
+                   (format "cd %s && node ox-ghost.js post create %s %s 2>&1"
+                           (ghost-publish--script-dir)
                            (shell-quote-argument title)
                            (shell-quote-argument json-file)))))
       (if (string-match "https://[^ \n]+" output)
@@ -463,12 +483,12 @@ TITLE defaults to #+TITLE value."
   (let* ((org-file (buffer-file-name))
          (json-file (concat (file-name-sans-extension org-file) ".json")))
     ;; Export to Lexical JSON
-    (require 'ox-lexical)
+    (require 'ox-ghost)
     (org-lexical-export-to-file)
     ;; Update via ghost.js
     (let ((output (ghost-publish--run-command
-                   (format "cd %s && node ghost.js post update %s %s 2>&1"
-                           (file-name-directory ghost-publish-script)
+                   (format "cd %s && node ox-ghost.js post update %s %s 2>&1"
+                           (ghost-publish--script-dir)
                            (shell-quote-argument slug-or-id)
                            (shell-quote-argument json-file)))))
       (if (string-match "https://[^ \n]+" output)
@@ -518,7 +538,7 @@ TITLE defaults to #+TITLE value."
   (ghost-enrich-buffer)
   (save-buffer)
   (message "Step 2/3: Exporting to Lexical JSON...")
-  (require 'ox-lexical)
+  (require 'ox-ghost)
   (let ((json-file (org-lexical-export-to-file)))
     (message "Step 3/3: Publishing to Ghost...")
     (let ((url (ghost-publish)))
@@ -532,7 +552,7 @@ TITLE defaults to #+TITLE value."
   (ghost-enrich-buffer)
   (save-buffer)
   (message "Exporting to Lexical JSON...")
-  (require 'ox-lexical)
+  (require 'ox-ghost)
   (let ((json-file (org-lexical-export-to-file)))
     (message "Exported: %s" json-file)
     json-file))
@@ -548,5 +568,5 @@ TITLE defaults to #+TITLE value."
   (save-buffer)
   (message "Done - ready to export with M-x ghost-preview or M-x ghost-publish"))
 
-(provide 'ghost-publish)
-;;; ghost-publish.el ends here
+(provide 'ox-ghost-publish)
+;;; ox-ghost-publish.el ends here
