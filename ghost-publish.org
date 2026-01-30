@@ -1,0 +1,266 @@
+#+TITLE: Ghost Publishing from Org-Mode
+#+AUTHOR: ii.coop
+#+DATE: 2026-01-29
+
+* Overview
+
+This library provides a complete workflow for publishing org-mode files to Ghost CMS with rich media support. The workflow separates concerns into distinct phases:
+
+| Phase    | Purpose                          | Speed    | Interactive |
+|----------+----------------------------------+----------+-------------|
+| Generate | Create media (TTS, images, video)| Fast     | Yes, iterate |
+| Enrich   | Add metadata to media/embeds     | Slower   | Once         |
+| Preview  | View HTML locally                | Fast     | Yes          |
+| Publish  | Send to Ghost                    | Fast     | Once         |
+
+* Installation
+
+#+BEGIN_SRC elisp
+(add-to-list 'load-path "/srv/research/org/ox-lexical")
+(require 'ghost-publish)
+
+;; Configure Ghost connection
+(setq ghost-publish-url "https://www.ii.coop"
+      ghost-publish-admin-key "YOUR_ADMIN_API_KEY")
+#+END_SRC
+
+* Phase 1: Generation
+
+Generation functions create media files, upload them to Ghost, and return basic org syntax. Run these iteratively while developing your post.
+
+** Text-to-Speech Audio
+
+#+BEGIN_SRC org
+,#+CALL: ghost-tts("Welcome to my tutorial")
+#+END_SRC
+
+Returns:
+#+BEGIN_EXAMPLE
+#+BEGIN_AUDIO :src https://ghost.site/content/media/2026/01/tts-xxx.mp3
+Welcome to my tutorial
+#+END_AUDIO
+#+END_EXAMPLE
+
+** Generated Images
+
+#+BEGIN_SRC org
+,#+CALL: ghost-image("Chapter One" "#e74c3c" "#c0392b")
+#+END_SRC
+
+Returns:
+#+BEGIN_EXAMPLE
+[[https://ghost.site/content/images/2026/01/img-xxx.png][Chapter One]]
+#+END_EXAMPLE
+
+** Generated Video
+
+#+BEGIN_SRC org
+,#+CALL: ghost-video("Org Mode Powers This" "#2d3436")
+#+END_SRC
+
+Returns:
+#+BEGIN_EXAMPLE
+#+BEGIN_VIDEO :src https://ghost.site/content/media/2026/01/vid-xxx.mp4
+Org Mode Powers This
+#+END_VIDEO
+#+END_EXAMPLE
+
+** Direct Upload
+
+#+BEGIN_SRC org
+,#+CALL: ghost-upload("/path/to/file.png")
+#+END_SRC
+
+Returns the Ghost URL for the uploaded file.
+
+* Phase 2: Enrichment
+
+Once content is stable, enrich adds metadata required by Ghost's Lexical format. This is a separate step because:
+
+1. Enrichment involves HTTP requests (slower)
+2. You don't want to re-fetch metadata on every iteration
+3. You can review enriched content before publishing
+
+** Commands
+
+| Command                       | Description                              |
+|-------------------------------+------------------------------------------|
+| =M-x ghost-enrich-buffer=     | Enrich all blocks in current buffer      |
+| =M-x ghost-enrich-region=     | Enrich blocks in selected region         |
+| =M-x ghost-enrich-at-point=   | Enrich single block at cursor            |
+
+** What Gets Enriched
+
+| Block Type | Added Metadata                                    |
+|------------+---------------------------------------------------|
+| VIDEO      | =:width=, =:height=, =:duration=, =:mimeType=, =:thumbnailSrc= |
+| AUDIO      | =:duration=, =:mimeType=                          |
+| EMBED      | =:html= (iframe code for YouTube/Vimeo)           |
+| BOOKMARK   | =:title=, =:description=, =:icon=, =:thumbnail=   |
+
+** Before Enrichment
+
+#+BEGIN_EXAMPLE
+#+BEGIN_VIDEO :src https://ghost.site/content/media/2026/01/demo.mp4
+My video description
+#+END_VIDEO
+
+#+BEGIN_EMBED :url https://www.youtube.com/watch?v=jNQXAC9IVRw
+First YouTube video
+#+END_EMBED
+#+END_EXAMPLE
+
+** After Enrichment (M-x ghost-enrich-buffer)
+
+#+BEGIN_EXAMPLE
+#+BEGIN_VIDEO :src https://ghost.site/content/media/2026/01/demo.mp4 :width 640 :height 360 :duration 5.2 :mimeType video/mp4
+My video description
+#+END_VIDEO
+
+#+BEGIN_EMBED :url https://www.youtube.com/watch?v=jNQXAC9IVRw :html "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/jNQXAC9IVRw\" frameborder=\"0\" allowfullscreen></iframe>"
+First YouTube video
+#+END_EMBED
+#+END_EXAMPLE
+
+* Phase 3: Preview
+
+Preview renders the org file to HTML without publishing, so you can verify appearance locally.
+
+| Command                | Description                              |
+|------------------------+------------------------------------------|
+| =M-x ghost-preview=    | Export to HTML, open in browser          |
+| =M-x ghost-preview-json= | Export to Lexical JSON, view in buffer |
+
+* Phase 4: Publish
+
+When satisfied with preview, publish to Ghost.
+
+| Command              | Description                              |
+|----------------------+------------------------------------------|
+| =M-x ghost-publish=  | Create new post (draft)                  |
+| =M-x ghost-update=   | Update existing post                     |
+| =M-x ghost-publish-and-open= | Publish and open in browser      |
+
+* Complete Workflow Example
+
+#+BEGIN_SRC text
+1. Create org file with content
+   #+TITLE: My Tutorial
+   #+TAGS: tutorial, demo
+
+   * Introduction
+   #+CALL: ghost-tts("Welcome to my tutorial")
+
+   * Main Content
+   #+CALL: ghost-image("Step One" "#667eea" "#764ba2")
+   ...
+
+2. Iterate on generation
+   - C-c C-c on blocks to regenerate
+   - Preview inline results
+   - Adjust text, colors, etc.
+
+3. Enrich when satisfied
+   M-x ghost-enrich-buffer
+   - Review the added metadata
+   - Verify blocks look correct
+
+4. Preview locally
+   M-x ghost-preview
+   - Opens HTML in browser
+   - Check layout, media playback
+
+5. Publish
+   M-x ghost-publish
+   - Creates draft on Ghost
+   - Returns URL for review
+#+END_SRC
+
+* Style Guide for Org Files
+
+** Required Headers
+
+#+BEGIN_EXAMPLE
+#+TITLE: Post Title
+#+DATE: 2026-01-29
+#+AUTHOR: ii.coop
+#+TAGS: tag1, tag2, tag3
+#+EXCERPT: Brief description for previews and SEO.
+#+END_EXAMPLE
+
+** Content Blocks
+
+| Use Case                | Recommended Block        |
+|-------------------------+--------------------------|
+| Important callout       | =#+BEGIN_CALLOUT :emoji= |
+| Collapsible content     | =#+BEGIN_TOGGLE=         |
+| External video          | =#+BEGIN_EMBED :url=     |
+| Uploaded video          | =#+BEGIN_VIDEO :src=     |
+| Audio player            | =#+BEGIN_AUDIO :src=     |
+| Link preview            | =#+BEGIN_BOOKMARK :url=  |
+| Call to action          | =#+BEGIN_BUTTON :url=    |
+
+** Generated Media Guidelines
+
+- *TTS*: Keep text concise (under 20 words per block)
+- *Images*: Use contrasting gradient colors for readability
+- *Video*: Keep under 10 seconds for concept demos
+
+** Color Palette
+
+Standard gradients for consistency:
+
+| Purpose   | Start     | End       |
+|-----------+-----------+-----------|
+| Info      | =#667eea= | =#764ba2= |
+| Warning   | =#f39c12= | =#e74c3c= |
+| Success   | =#00b894= | =#00cec9= |
+| Dark      | =#2d3436= | =#636e72= |
+
+* Dependencies
+
+External tools required:
+
+| Tool       | Purpose                | Install                    |
+|------------+------------------------+----------------------------|
+| espeak-ng  | Text-to-speech         | =dnf install espeak-ng=    |
+| ffmpeg     | Audio/video processing | =dnf install ffmpeg=       |
+| ffprobe    | Media metadata         | (included with ffmpeg)     |
+| magick     | Image generation       | =dnf install ImageMagick=  |
+| curl       | HTTP requests          | (usually pre-installed)    |
+| node       | Ghost API client       | =dnf install nodejs=       |
+
+* Architecture
+
+#+BEGIN_SRC text
+┌─────────────────────────────────────────────────────────┐
+│                    Org File (.org)                      │
+│  #+TITLE, content, #+CALL: ghost-* functions            │
+└─────────────────────────────────────────────────────────┘
+                           │
+        ┌──────────────────┼──────────────────┐
+        ▼                  ▼                  ▼
+   ┌─────────┐       ┌──────────┐       ┌─────────┐
+   │ Generate│       │  Enrich  │       │ Preview │
+   │ (iterate)│       │  (once)  │       │ (local) │
+   └─────────┘       └──────────┘       └─────────┘
+        │                  │                  │
+        ▼                  ▼                  ▼
+   ┌─────────┐       ┌──────────┐       ┌─────────┐
+   │espeak-ng│       │ ffprobe  │       │ Browser │
+   │ ffmpeg  │       │  curl    │       │         │
+   │ magick  │       │          │       │         │
+   └─────────┘       └──────────┘       └─────────┘
+        │                  │
+        └────────┬─────────┘
+                 ▼
+        ┌─────────────────┐
+        │   ghost.js      │
+        │ (upload/publish)│
+        └─────────────────┘
+                 │
+                 ▼
+        ┌─────────────────┐
+        │   Ghost CMS     │
+        └─────────────────┘
+#+END_SRC

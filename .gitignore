@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Generated JSON (except package/demo files)
+*.json
+!package.json
+!package-lock.json
+!demo/*.json
+
+# Demo media (ignore while iterating, commit example-* files)
+demo/*.mp3
+demo/*.mp4
+demo/*.wav
+demo/*.png
+demo/*.jpg
+!demo/example-*.mp3
+!demo/example-*.mp4
+!demo/example-*.png
+
+# Editor/OS files
+*~
+.DS_Store
+\#*\#
+.#*
+
+# Emacs byte-compiled
+*.elc
+
+# Local development
+.env
+tmp/

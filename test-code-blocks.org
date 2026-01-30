@@ -1,0 +1,257 @@
+#+TITLE: Code Block Showcase
+#+DATE: 2026-01-29
+
+* Simple Code Blocks
+
+** Python
+
+#+BEGIN_SRC python
+def fibonacci(n):
+    """Generate Fibonacci sequence."""
+    a, b = 0, 1
+    for _ in range(n):
+        yield a
+        a, b = b, a + b
+
+print(list(fibonacci(10)))
+#+END_SRC
+
+** JavaScript
+
+#+BEGIN_SRC javascript
+const fetchData = async (url) => {
+  const response = await fetch(url);
+  const data = await response.json();
+  return data;
+};
+
+// Usage
+fetchData('https://api.example.com/posts')
+  .then(posts => console.log(posts));
+#+END_SRC
+
+** Shell
+
+#+BEGIN_SRC shell
+#!/bin/bash
+for file in *.org; do
+    echo "Processing: $file"
+    wc -l "$file"
+done
+#+END_SRC
+
+** SQL
+
+#+BEGIN_SRC sql
+SELECT
+    p.title,
+    p.status,
+    COUNT(c.id) as comment_count
+FROM posts p
+LEFT JOIN comments c ON c.post_id = p.id
+WHERE p.published_at > '2026-01-01'
+GROUP BY p.id
+ORDER BY comment_count DESC
+LIMIT 10;
+#+END_SRC
+
+** Emacs Lisp
+
+#+BEGIN_SRC elisp
+(defun org-to-ghost (file)
+  "Export FILE to Ghost Lexical JSON."
+  (interactive "fOrg file: ")
+  (with-temp-buffer
+    (insert-file-contents file)
+    (org-mode)
+    (org-export-as 'lexical)))
+#+END_SRC
+
+* Code with Output
+
+** Python with text output
+
+#+BEGIN_SRC python :exports both
+import sys
+print(f"Python {sys.version}")
+print("Hello from Python!")
+#+END_SRC
+
+#+RESULTS:
+: Python 3.12.0 (main, Oct  2 2024)
+: Hello from Python!
+
+** Shell with output
+
+#+BEGIN_SRC shell :exports both
+echo "Current date: $(date)"
+echo "User: $(whoami)"
+#+END_SRC
+
+#+RESULTS:
+: Current date: Wed Jan 29 11:45:00 EST 2026
+: User: hh
+
+* Code Generating Code
+
+** Python generating JSON
+
+#+BEGIN_SRC python :exports both :results output
+import json
+
+config = {
+    "site": "ii.coop",
+    "theme": "casper",
+    "features": ["members", "newsletters", "comments"],
+    "settings": {
+        "posts_per_page": 10,
+        "navigation": [
+            {"label": "Home", "url": "/"},
+            {"label": "About", "url": "/about/"}
+        ]
+    }
+}
+
+print(json.dumps(config, indent=2))
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_SRC json
+{
+  "site": "ii.coop",
+  "theme": "casper",
+  "features": ["members", "newsletters", "comments"],
+  "settings": {
+    "posts_per_page": 10,
+    "navigation": [
+      {"label": "Home", "url": "/"},
+      {"label": "About", "url": "/about/"}
+    ]
+  }
+}
+#+END_SRC
+
+** Python generating SQL
+
+#+BEGIN_SRC python :exports both :results output
+tables = ['users', 'posts', 'comments']
+for table in tables:
+    print(f"SELECT * FROM {table} LIMIT 5;")
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_SRC sql
+SELECT * FROM users LIMIT 5;
+SELECT * FROM posts LIMIT 5;
+SELECT * FROM comments LIMIT 5;
+#+END_SRC
+
+** Elisp generating YAML
+
+#+BEGIN_SRC elisp :exports both :results raw
+"#+BEGIN_SRC yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ghost-config
+data:
+  url: https://ii.coop
+  mail__transport: SMTP
+#+END_SRC"
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_SRC yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ghost-config
+data:
+  url: https://ii.coop
+  mail__transport: SMTP
+#+END_SRC
+
+* Multi-language Pipeline
+
+** Step 1: Generate data (Python)
+
+#+BEGIN_SRC python :exports both :results output
+# Simulate fetching data
+data = [
+    {"id": 1, "name": "Alice", "role": "admin"},
+    {"id": 2, "name": "Bob", "role": "editor"},
+    {"id": 3, "name": "Carol", "role": "author"}
+]
+import json
+print(json.dumps(data))
+#+END_SRC
+
+#+RESULTS:
+: [{"id": 1, "name": "Alice", "role": "admin"}, {"id": 2, "name": "Bob", "role": "editor"}, {"id": 3, "name": "Carol", "role": "author"}]
+
+** Step 2: Transform with jq (Shell)
+
+#+BEGIN_SRC shell :exports both :results output
+echo '[{"id": 1, "name": "Alice", "role": "admin"}, {"id": 2, "name": "Bob", "role": "editor"}]' | \
+  jq '.[] | "User: \(.name) (\(.role))"'
+#+END_SRC
+
+#+RESULTS:
+: "User: Alice (admin)"
+: "User: Bob (editor)"
+
+** Step 3: Generate config (YAML output)
+
+#+BEGIN_SRC python :exports both :results output
+import yaml
+
+config = {
+    'users': [
+        {'name': 'Alice', 'permissions': ['read', 'write', 'admin']},
+        {'name': 'Bob', 'permissions': ['read', 'write']}
+    ]
+}
+
+print(yaml.dump(config, default_flow_style=False))
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_SRC yaml
+users:
+- name: Alice
+  permissions:
+  - read
+  - write
+  - admin
+- name: Bob
+  permissions:
+  - read
+  - write
+#+END_SRC
+
+* Inline Examples
+
+Here's how you might use =kubectl= to check pods:
+
+#+BEGIN_SRC shell
+kubectl get pods -n ghost
+#+END_SRC
+
+The output would look like:
+
+#+BEGIN_EXAMPLE
+NAME                     READY   STATUS    RESTARTS   AGE
+ghost-6d4f5b7c8-abc12    1/1     Running   0          2d
+ghost-6d4f5b7c8-def34    1/1     Running   0          2d
+mysql-7f8d9c6b5-xyz99    1/1     Running   0          5d
+#+END_EXAMPLE
+
+* Summary
+
+This document demonstrates:
+
+1. Simple code blocks in multiple languages
+2. Code with text output (=:exports both=)
+3. Code generating other code formats (JSON, SQL, YAML)
+4. Multi-step pipelines with different languages
+5. Example blocks for sample output

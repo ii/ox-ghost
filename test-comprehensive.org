@@ -1,0 +1,114 @@
+#+TITLE: Comprehensive Lexical Export Test
+#+AUTHOR: ii.coop
+
+* Basic Text Elements
+
+This paragraph has *bold*, /italic/, _underline_, +strikethrough+, and =inline code=.
+
+Here's a [[https://ghost.org][link to Ghost]].
+
+** Nested Heading
+
+Some content under a nested heading.
+
+* Lists
+
+Unordered list:
+- Item one
+- Item two
+- Item three
+
+Ordered list:
+1. First item
+2. Second item
+3. Third item
+
+* Blocks
+
+#+BEGIN_QUOTE
+This is a quote block with some important text.
+#+END_QUOTE
+
+#+BEGIN_SRC python
+def hello():
+    print("Hello, World!")
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+This is example text
+preserved exactly as written
+#+END_EXAMPLE
+
+-----
+
+* Special Blocks
+
+#+BEGIN_CALLOUT :emoji 🎉 :color green
+Congratulations! This is a success callout.
+#+END_CALLOUT
+
+#+BEGIN_TOGGLE :heading "Click to expand"
+This content is hidden until the toggle is clicked.
+#+END_TOGGLE
+
+#+BEGIN_BUTTON :url https://ghost.org :alignment center
+Get Started
+#+END_BUTTON
+
+#+BEGIN_ASIDE
+This is an aside block for secondary content.
+#+END_ASIDE
+
+* Media
+
+#+ATTR_LEXICAL: :cardWidth wide
+[[file:example-image.jpg][An example image]]
+
+#+BEGIN_GALLERY :images "img1.jpg, img2.jpg, img3.jpg"
+#+END_GALLERY
+
+#+BEGIN_VIDEO :src https://example.com/video.mp4
+#+END_VIDEO
+
+#+BEGIN_AUDIO :src https://example.com/audio.mp3
+Podcast Episode Title
+#+END_AUDIO
+
+* Embeds
+
+#+BEGIN_EMBED :url https://twitter.com/example/status/123
+Twitter embed
+#+END_EMBED
+
+#+BEGIN_BOOKMARK :url https://example.com
+Example Bookmark
+#+END_BOOKMARK
+
+* Raw HTML
+
+#+BEGIN_EXPORT html
+<div class="custom">Custom HTML content</div>
+#+END_EXPORT
+
+* Product Card
+
+#+BEGIN_PRODUCT :url https://shop.example.com/item :buttonText "Buy Now"
+Amazing Product Name
+#+END_PRODUCT
+
+* File Download
+
+#+BEGIN_FILE :src https://example.com/document.pdf :fileName "Important Document.pdf"
+Download this important document
+#+END_FILE
+
+* Signup Form
+
+#+BEGIN_SIGNUP :layout regular :buttonText Subscribe Now
+#+END_SIGNUP
+
+* Call to Action
+
+#+BEGIN_CTA :layout minimal :buttonText Learn More :url https://example.com
+Get started with our amazing platform today!
+#+END_CTA

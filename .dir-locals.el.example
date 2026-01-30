@@ -1,0 +1,14 @@
+;;; .dir-locals.el example for ox-lexical
+;;
+;; Copy this to your project directory and customize.
+;; These settings apply to all org files in the directory tree.
+
+((org-mode
+  . ((ox-lexical-ghost-defaults
+      . ((type . "post")               ; "post" or "page"
+         (status . "draft")            ; "draft", "published", or "scheduled"
+         (visibility . "public")       ; "public", "members", "paid", "tiers"
+         (tags . ("org-mode" "ii"))    ; default tags
+         (newsletter . "default")))    ; default newsletter
+     (ox-lexical-ghost-config
+      . "/srv/ii.coop/ghost-config.json"))))

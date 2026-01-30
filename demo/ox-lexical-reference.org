@@ -1,0 +1,879 @@
+#+TITLE: ox-lexical: The Complete Reference
+#+AUTHOR: ii.coop
+#+DATE: 2026-01-29
+#+DESCRIPTION: A self-documenting guide to every Ghost Lexical node type with org-mode source examples
+
+#+GHOST_SLUG: ox-lexical-reference
+#+GHOST_TYPE: post
+#+GHOST_STATUS: draft
+#+GHOST_VISIBILITY: public
+#+GHOST_TAGS: ox-lexical, org-mode, ghost, reference, documentation
+#+GHOST_EXCERPT: A self-documenting guide to every Ghost Lexical node type with org-mode source examples. See the rendered result, then click to view the org-mode code that produces it.
+
+#+PROPERTY: header-args :eval never-export
+
+* Introduction
+
+This is a *self-documenting reference* for ox-lexical, the Emacs org-mode export
+backend that converts =.org= files to Ghost's Lexical JSON format.
+
+Every section shows:
+1. The *rendered result* as it appears in Ghost
+2. An *Org Source* toggle below (click to see the org-mode code)
+
+At the end, you can download this very document and its Lexical JSON output.
+
+#+BEGIN_CALLOUT :emoji "bulb" :color blue
+Click any "Org Source" toggle to see the org-mode code that produces the
+rendered result above it. Copy and adapt for your own posts!
+#+END_CALLOUT
+
+* Text Fundamentals
+
+** Paragraphs
+
+The simplest element. Just write text with blank lines between paragraphs.
+
+This is the first paragraph. It can span multiple
+lines in your org file - they'll be joined.
+
+This is a second paragraph, separated by a blank line.
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+This is the first paragraph. It can span multiple
+lines in your org file - they'll be joined.
+
+This is a second paragraph, separated by a blank line.
+#+END_SRC
+#+END_TOGGLE
+
+** Text Formatting
+
+Org-mode formatting maps to Lexical's text format bitmask:
+
+| Format        | Org Syntax      | Bitmask |
+|---------------+-----------------+---------|
+| Bold          | =*bold*=          |       1 |
+| Italic        | =/italic/=        |       2 |
+| Strikethrough | =+struck+=        |       4 |
+| Underline     | =_underline_=     |       8 |
+| Code          | ===code===        |      16 |
+
+#+BEGIN_TOGGLE :heading "Table Org Source"
+#+BEGIN_SRC org
+| Format        | Org Syntax      | Bitmask |
+|---------------+-----------------+---------|
+| Bold          | =*bold*=          |       1 |
+| Italic        | =/italic/=        |       2 |
+#+END_SRC
+#+END_TOGGLE
+
+Format text with *bold*, /italic/, +strikethrough+, _underline_, and =code=.
+
+Combine them: */bold-italic/*, *_bold-underline_*, */+all three+/*.
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+Format text with *bold*, /italic/, +strikethrough+, _underline_, and =code=.
+
+Combine them: */bold-italic/*, *_bold-underline_*, */+all three+/*.
+#+END_SRC
+#+END_TOGGLE
+
+** Links
+
+External link: [[https://ghost.org][Ghost CMS]]
+
+Plain URL auto-links: https://ii.coop
+
+Email: [[mailto:hello@ii.coop][Contact us]]
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+External link: [[https://ghost.org][Ghost CMS]]
+
+Plain URL auto-links: https://ii.coop
+
+Email: [[mailto:hello@ii.coop][Contact us]]
+#+END_SRC
+#+END_TOGGLE
+
+** Line Breaks
+
+Force line breaks with double backslash.
+
+Line one\\
+Line two\\
+Line three
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+Line one\\
+Line two\\
+Line three
+#+END_SRC
+#+END_TOGGLE
+
+* Headings
+
+Org headlines become Lexical headings. The post title is H1, so content starts at H2.
+
+| Org Stars | Lexical Tag | Typical Use          |
+|-----------+-------------+----------------------|
+| =*=       | H2          | Major sections       |
+| =**=      | H3          | Subsections          |
+| =***=     | H4          | Deep structure       |
+| =****=    | H5          | Rarely needed        |
+| =*****=   | H6          | Almost never         |
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,* H2 - Major Section (one star)
+,** H3 - Subsection (two stars)
+,*** H4 - Sub-subsection (three stars)
+,**** H5 - Rarely needed (four stars)
+,***** H6 - Avoid this deep (five stars)
+#+END_SRC
+#+END_TOGGLE
+
+#+BEGIN_CALLOUT :emoji "warning" :color yellow
+Deep nesting (H5, H6) often signals your content structure needs rethinking.
+Flat is usually better.
+#+END_CALLOUT
+
+* Lists
+
+** Unordered Lists
+
+- First item
+- Second item with *bold*
+- Third item with [[https://example.com][link]]
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+- First item
+- Second item with *bold*
+- Third item with [[https://example.com][link]]
+#+END_SRC
+#+END_TOGGLE
+
+** Ordered Lists
+
+1. First step
+2. Second step
+3. Third step
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+1. First step
+2. Second step
+3. Third step
+#+END_SRC
+#+END_TOGGLE
+
+** Nested Lists
+
+- Parent item
+  - Child item
+  - Another child
+    - Grandchild
+- Back to parent
+
+1. Numbered parent
+   1. Numbered child
+   2. Another child
+2. Back to parent
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+- Parent item
+  - Child item
+  - Another child
+    - Grandchild
+- Back to parent
+
+1. Numbered parent
+   1. Numbered child
+   2. Another child
+2. Back to parent
+#+END_SRC
+#+END_TOGGLE
+
+** Checkbox Lists
+
+- [ ] Unchecked task
+- [X] Completed task
+- [-] In progress
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+- [ ] Unchecked task
+- [X] Completed task
+- [-] In progress
+#+END_SRC
+#+END_TOGGLE
+
+* Blockquotes
+
+#+BEGIN_QUOTE
+The best way to predict the future is to invent it.
+— Alan Kay
+#+END_QUOTE
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_QUOTE
+The best way to predict the future is to invent it.
+— Alan Kay
+,#+END_QUOTE
+#+END_SRC
+#+END_TOGGLE
+
+* Horizontal Rules
+
+Content above.
+
+-----
+
+Content below.
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+Content above.
+
+-----
+
+Content below.
+#+END_SRC
+#+END_TOGGLE
+
+* Code Blocks
+
+Code blocks support syntax highlighting via Prism.js.
+
+#+BEGIN_SRC python
+def hello(name):
+    return f"Hello, {name}!"
+
+print(hello("Ghost"))
+#+END_SRC
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_SRC python
+def hello(name):
+    return f"Hello, {name}!"
+
+print(hello("Ghost"))
+,#+END_SRC
+#+END_SRC
+#+END_TOGGLE
+
+** More Languages
+
+#+BEGIN_SRC javascript
+// JavaScript
+const greet = (name) => `Hello, ${name}!`;
+console.log(greet("World"));
+#+END_SRC
+
+#+BEGIN_SRC bash
+#!/bin/bash
+echo "Hello from $(hostname)"
+#+END_SRC
+
+#+BEGIN_SRC elisp
+;; Emacs Lisp
+(defun greet (name)
+  (message "Hello, %s!" name))
+#+END_SRC
+
+* Callout Blocks
+
+Callouts highlight important information with color-coded backgrounds.
+
+#+BEGIN_CALLOUT :emoji "bulb" :color blue
+*Blue* (=:color blue=) — Tips, information, general highlights.
+Default color if not specified.
+#+END_CALLOUT
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_CALLOUT :emoji "bulb" :color blue
+Your message here. Supports *formatting*.
+,#+END_CALLOUT
+#+END_SRC
+#+END_TOGGLE
+
+** All Seven Colors
+
+#+BEGIN_CALLOUT :emoji "white_check_mark" :color green
+*Green* (=:color green=) — Success, best practices, "do this".
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "warning" :color yellow
+*Yellow* (=:color yellow=) — Warnings, caution, pay attention.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "x" :color red
+*Red* (=:color red=) — Errors, danger, "don't do this".
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "sparkles" :color purple
+*Purple* (=:color purple=) — Special features, highlights.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "art" :color pink
+*Pink* (=:color pink=) — Creative, playful content.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "memo" :color grey
+*Grey* (=:color grey=) — Neutral notes, supplementary info.
+#+END_CALLOUT
+
+** Common Emoji Names
+
+| Emoji | Name               | Use Case         |
+|-------+--------------------+------------------|
+| 💡    | =bulb=             | Tips, ideas      |
+| ✅    | =white_check_mark= | Success, do this |
+| ⚠️    | =warning=          | Caution          |
+| ❌    | =x=                | Error, don't     |
+| 🚀    | =rocket=           | Launch, deploy   |
+| 📝    | =memo=             | Notes            |
+| ✨    | =sparkles=         | Special          |
+
+* Toggle Blocks
+
+Toggles hide content behind a clickable heading. They support rich HTML content!
+
+#+BEGIN_TOGGLE :heading "Click to expand"
+Hidden content here. Supports *formatting*, lists, and code:
+
+#+BEGIN_SRC python
+print("Code inside a toggle!")
+#+END_SRC
+#+END_TOGGLE
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_TOGGLE :heading "Click to expand"
+Hidden content here. Supports *formatting*, lists, and code:
+
+,#+BEGIN_SRC python
+print("Code inside a toggle!")
+,#+END_SRC
+,#+END_TOGGLE
+#+END_SRC
+#+END_TOGGLE
+
+#+BEGIN_TOGGLE :heading "Toggle with a list"
+Toggles are great for:
+- FAQs
+- Technical details
+- Optional deep-dives
+- Spoiler warnings
+#+END_TOGGLE
+
+* Aside Blocks
+
+Asides provide tangential information with distinct styling.
+
+#+BEGIN_ASIDE
+Tangential content here. Supports *formatting* and [[https://ghost.org][links]].
+#+END_ASIDE
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_ASIDE
+Tangential content here. Supports *formatting* and [[https://ghost.org][links]].
+,#+END_ASIDE
+#+END_SRC
+#+END_TOGGLE
+
+* Button Blocks
+
+Buttons create prominent call-to-action links.
+
+#+BEGIN_BUTTON :url "https://ghost.org" :alignment left
+Left Aligned
+#+END_BUTTON
+
+#+BEGIN_BUTTON :url "https://ghost.org" :alignment center
+Center Aligned
+#+END_BUTTON
+
+#+BEGIN_BUTTON :url "https://ghost.org" :alignment right
+Right Aligned
+#+END_BUTTON
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_BUTTON :url "https://example.com" :alignment center
+Button Text
+,#+END_BUTTON
+#+END_SRC
+#+END_TOGGLE
+
+* Header Cards
+
+Full-width banners with text overlay.
+
+#+BEGIN_HEADER :size small
+Small Header
+#+END_HEADER
+
+#+BEGIN_HEADER :size medium
+Medium Header
+#+END_HEADER
+
+#+BEGIN_HEADER :size large
+Large Header
+#+END_HEADER
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_HEADER :size small
+Header Text
+,#+END_HEADER
+#+END_SRC
+#+END_TOGGLE
+
+* Signup Forms
+
+Capture email subscribers.
+
+Regular layout:
+
+#+BEGIN_SIGNUP :layout regular :buttonText "Subscribe"
+#+END_SIGNUP
+
+Wide layout:
+
+#+BEGIN_SIGNUP :layout wide :buttonText "Join Newsletter"
+#+END_SIGNUP
+
+Split layout:
+
+#+BEGIN_SIGNUP :layout split :buttonText "Get Updates"
+#+END_SIGNUP
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_SIGNUP :layout regular :buttonText "Subscribe"
+,#+END_SIGNUP
+#+END_SRC
+#+END_TOGGLE
+
+* Call to Action (CTA)
+
+Prominent sections to drive reader action.
+
+#+BEGIN_CTA :layout minimal :buttonText "Learn More" :url "https://ghost.org"
+Simple and clean. Great for subtle prompts.
+#+END_CTA
+
+#+BEGIN_CTA :layout immersive :buttonText "Get Started" :url "https://ghost.org"
+Bold and attention-grabbing. For important conversions.
+#+END_CTA
+
+#+BEGIN_CTA :layout branded :buttonText "Join Us" :url "https://ghost.org"
+Branded styling. Shows site identity.
+#+END_CTA
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_CTA :layout minimal :buttonText "Learn More" :url "https://example.com"
+Compelling message here.
+,#+END_CTA
+#+END_SRC
+#+END_TOGGLE
+
+* Bookmark Cards
+
+Rich link previews with metadata.
+
+#+BEGIN_BOOKMARK :url "https://ghost.org" :title "Ghost: The Creator Economy Platform" :description "The world's most popular modern publishing platform for creating a new media platform." :thumbnail "https://ghost.org/images/meta/ghost.png" :icon "https://ghost.org/favicon.ico"
+Ghost
+#+END_BOOKMARK
+
+#+BEGIN_BOOKMARK :url "https://github.com/TryGhost/Ghost" :title "TryGhost/Ghost" :description "Independent technology for modern publishing, memberships, subscriptions and newsletters." :icon "https://github.githubassets.com/favicons/favicon.svg"
+GitHub
+#+END_BOOKMARK
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_BOOKMARK :url "URL" :title "Title" :description "Desc" :thumbnail "IMG" :icon "ICO"
+Fallback text
+,#+END_BOOKMARK
+#+END_SRC
+#+END_TOGGLE
+
+* Product Cards
+
+Showcase products with optional buy buttons.
+
+#+BEGIN_PRODUCT :url "https://example.com/widget" :buttonText "Buy Now - $49"
+Premium Widget Pro
+#+END_PRODUCT
+
+#+BEGIN_PRODUCT :url "https://example.com/course"
+Advanced Course (no button)
+#+END_PRODUCT
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_PRODUCT :url "https://shop.example.com/item" :buttonText "Buy Now"
+Product Title
+,#+END_PRODUCT
+#+END_SRC
+#+END_TOGGLE
+
+* Images
+
+| Width   | Attribute            | Use Case            |
+|---------+----------------------+---------------------|
+| Regular | =:cardWidth regular= | Inline with text    |
+| Wide    | =:cardWidth wide=    | Break out of column |
+| Full    | =:cardWidth full=    | Edge to edge        |
+
+Regular width (default):
+
+#+ATTR_LEXICAL: :cardWidth regular
+[[https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800][Laptop with code]]
+
+Wide width:
+
+#+ATTR_LEXICAL: :cardWidth wide
+[[https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200][Programming workspace]]
+
+Full width:
+
+#+ATTR_LEXICAL: :cardWidth full
+[[https://images.unsplash.com/photo-1484417894907-623942c8ee29?w=1600][Panoramic setup]]
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+ATTR_LEXICAL: :cardWidth wide
+[[https://example.com/image.jpg][Alt text description]]
+#+END_SRC
+#+END_TOGGLE
+
+* Video Blocks
+
+| Attribute       | Description          | Example             |
+|-----------------+----------------------+---------------------|
+| =:src=          | Video URL (required) | =https://.../v.mp4= |
+| =:width=        | Width in pixels      | =1920=              |
+| =:height=       | Height in pixels     | =1080=              |
+| =:duration=     | Duration in seconds  | =30=                |
+| =:mimeType=     | MIME type            | =video/mp4=         |
+| =:thumbnailSrc= | Poster image URL     | =https://.../t.jpg= |
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_VIDEO :src "URL" :width 1920 :height 1080 :duration 30 :mimeType "video/mp4"
+Caption text
+,#+END_VIDEO
+#+END_SRC
+#+END_TOGGLE
+
+#+BEGIN_CALLOUT :emoji "memo" :color grey
+Video attributes can be auto-populated using =ghost-publish-enrich-buffer=
+which probes uploaded files for metadata.
+#+END_CALLOUT
+
+* Audio Blocks
+
+| Attribute   | Description           | Example        |
+|-------------+-----------------------+----------------|
+| =:src=      | Audio URL (required)  | =https://...=  |
+| =:duration= | Duration in seconds   | =120=          |
+| =:mimeType= | MIME type             | =audio/mpeg=   |
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_AUDIO :src "URL" :duration 120 :mimeType "audio/mpeg"
+Track title
+,#+END_AUDIO
+#+END_SRC
+#+END_TOGGLE
+
+* File Downloads
+
+#+BEGIN_FILE :src "https://example.com/guide.pdf" :fileName "complete-guide.pdf"
+Download the Complete Guide (PDF, 2.4MB)
+#+END_FILE
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_FILE :src "URL" :fileName "document.pdf"
+Download description
+,#+END_FILE
+#+END_SRC
+#+END_TOGGLE
+
+* Gallery Blocks
+
+#+BEGIN_GALLERY
+[[https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600][Code editor]]
+[[https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=600][Terminal]]
+[[https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=600][Desk setup]]
+[[https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=600][Debugging]]
+#+END_GALLERY
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_GALLERY
+[[https://example.com/img1.jpg][Alt 1]]
+[[https://example.com/img2.jpg][Alt 2]]
+[[https://example.com/img3.jpg][Alt 3]]
+,#+END_GALLERY
+#+END_SRC
+#+END_TOGGLE
+
+* Embed Blocks
+
+Embed external content (YouTube, Twitter, etc.).
+
+#+BEGIN_CALLOUT :emoji "warning" :color yellow
+The =:html= attribute contains the embed code. Ghost renders this
+when the =:url= matches a supported oEmbed provider.
+#+END_CALLOUT
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_EMBED :url "https://youtube.com/watch?v=..." :html "<iframe>...</iframe>"
+Fallback title
+,#+END_EMBED
+#+END_SRC
+#+END_TOGGLE
+
+* Tables
+
+Tables export as HTML blocks (Lexical lacks native table support).
+
+| Feature   | Status | Notes            |
+|-----------+--------+------------------|
+| Headings  | Done   | H2-H6 supported  |
+| Lists     | Done   | Nested too       |
+| Callouts  | Done   | 7 colors         |
+| Tables    | Done   | Via HTML export  |
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+| Column A | Column B | Column C |
+|----------+----------+----------|
+| Value 1  | Value 2  | Value 3  |
+| Value 4  | Value 5  | Value 6  |
+#+END_SRC
+#+END_TOGGLE
+
+* REPL Blocks
+
+REPL blocks combine code with output in styled presentations.
+
+** Simple (default)
+
+#+BEGIN_REPL
+#+BEGIN_SRC python
+2 + 2
+#+END_SRC
+
+#+RESULTS:
+: 4
+#+END_REPL
+
+** Labeled
+
+#+BEGIN_REPL :style labeled :label "Output"
+#+BEGIN_SRC python
+for i in range(3):
+    print(f"Item {i}")
+#+END_SRC
+
+#+RESULTS:
+: Item 0
+: Item 1
+: Item 2
+#+END_REPL
+
+** Callout
+
+#+BEGIN_REPL :style callout :emoji "white_check_mark" :color green
+#+BEGIN_SRC bash
+echo "Build succeeded!"
+#+END_SRC
+
+#+RESULTS:
+: Build succeeded!
+#+END_REPL
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_REPL :style callout :emoji "checkmark" :color green
+,#+BEGIN_SRC python
+print("hello")
+,#+END_SRC
+
+,#+RESULTS:
+: hello
+,#+END_REPL
+#+END_SRC
+#+END_TOGGLE
+
+** Toggle
+
+#+BEGIN_REPL :style toggle :heading "Show implementation"
+#+BEGIN_SRC python
+def fibonacci(n):
+    a, b = 0, 1
+    for _ in range(n):
+        yield a
+        a, b = b, a + b
+
+list(fibonacci(8))
+#+END_SRC
+
+#+RESULTS:
+: [0, 1, 1, 2, 3, 5, 8, 13]
+#+END_REPL
+
+** Aside
+
+#+BEGIN_REPL :style aside
+#+BEGIN_SRC python
+# Alternative one-liner
+fib = lambda n: [0,1,1,2,3,5,8,13,21,34][:n]
+fib(8)
+#+END_SRC
+
+#+RESULTS:
+: [0, 1, 1, 2, 3, 5, 8, 13]
+#+END_REPL
+
+* Raw HTML
+
+When Lexical nodes aren't enough, embed raw HTML.
+
+#+BEGIN_EXPORT html
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem; border-radius: 8px; color: white; text-align: center;">
+  <h3 style="margin: 0 0 0.5rem 0;">Custom HTML Block</h3>
+  <p style="margin: 0; opacity: 0.9;">
+    Any HTML, CSS, or embedded widgets.
+  </p>
+</div>
+#+END_EXPORT
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_EXPORT html
+<div style="background: #667eea; padding: 2rem; color: white;">
+  Custom HTML content
+</div>
+,#+END_EXPORT
+#+END_SRC
+#+END_TOGGLE
+
+* Raw Lexical JSON
+
+Insert raw Lexical JSON directly (advanced).
+
+This is useful for nodes ox-lexical doesn't yet support.
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_SRC org
+,#+BEGIN_EXPORT lexical
+{"type":"paragraph","version":1,"children":[...]}
+,#+END_EXPORT
+#+END_SRC
+#+END_TOGGLE
+
+* The Export Pipeline
+
+** Step 1: Write Your Org File
+
+Create your content using the patterns shown above.
+
+** Step 2: Export to Lexical JSON
+
+#+BEGIN_SRC bash
+cd /path/to/ox-lexical
+./org-to-lexical.sh input.org output.json
+#+END_SRC
+
+** Step 3: Validate the Output
+
+#+BEGIN_SRC bash
+node validate-lexical.js output.json
+# With HTML preview:
+node validate-lexical.js output.json --html preview.html
+#+END_SRC
+
+** Step 4: Create Ghost Post
+
+#+BEGIN_SRC bash
+cd /srv/ii.coop
+node ghost.js post create "Post Title" output.json --format lexical
+#+END_SRC
+
+** Step 5: Upload Media (Optional)
+
+For video/audio/files, upload first then update the org with URLs:
+
+#+BEGIN_SRC bash
+# Upload media file
+node ghost.js upload /path/to/video.mp4
+
+# Returns: https://coop.ghost.io/content/media/2026/01/video.mp4
+# Add this URL to your :src attribute
+#+END_SRC
+
+** Step 6: Enrich Media Metadata
+
+Auto-populate width/height/duration from uploaded files:
+
+#+BEGIN_SRC elisp
+;; In Emacs, with ghost-publish.el loaded:
+M-x ghost-publish-enrich-buffer
+#+END_SRC
+
+This probes each media URL and adds the metadata attributes.
+
+* Download This Document
+
+This post is self-documenting. Download the source files:
+
+#+BEGIN_FILE :src "https://www.ii.coop/content/files/2026/01/ox-lexical-reference.org" :fileName "ox-lexical-reference.org"
+Org-mode Source (the file that generated this post)
+#+END_FILE
+
+#+BEGIN_FILE :src "https://www.ii.coop/content/files/2026/01/ox-lexical-reference.json" :fileName "ox-lexical-reference.json"
+Lexical JSON Output (what Ghost renders)
+#+END_FILE
+
+#+BEGIN_CALLOUT :emoji "white_check_mark" :color green
+These are the actual files! Download the org, modify it, re-export,
+and create your own posts using the same pipeline.
+#+END_CALLOUT
+
+* Summary: All Node Types
+
+| Category  | Nodes                                                 |
+|-----------+-------------------------------------------------------|
+| Text      | Paragraph, Heading (H2-H6), Line Break                |
+| Format    | Bold, Italic, Strikethrough, Underline, Code, Link    |
+| Structure | Blockquote, Horizontal Rule, Table (as HTML)          |
+| Lists     | Ordered, Unordered, Nested, Checkbox                  |
+| Code      | Code Block (syntax highlighted)                       |
+| Cards     | Callout (7 colors), Toggle, Aside, Button, Bookmark   |
+| Media     | Image (3 widths), Video, Audio, Gallery, File, Embed  |
+| Ghost     | Header (3 sizes), Signup (3 layouts), CTA (3 layouts) |
+| Product   | Product Card                                          |
+| Special   | REPL (5 styles), Raw HTML, Raw Lexical                |
+
+#+BEGIN_CTA :layout minimal :buttonText "View on GitHub" :url "https://github.com/ii-org/ox-lexical"
+ox-lexical is open source. Contributions welcome!
+#+END_CTA

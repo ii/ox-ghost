@@ -1,0 +1,80 @@
+#+TITLE: ox-lexical Media Examples
+#+AUTHOR: ii.coop
+#+DATE: 2026-01-30
+#+DESCRIPTION: Demonstrates audio, video, and image embedding in ox-lexical
+
+#+GHOST_SLUG: ox-lexical-media-examples
+#+GHOST_TYPE: post
+#+GHOST_STATUS: draft
+#+GHOST_TAGS: ox-lexical, demo, media
+
+* Media Node Examples
+
+This document demonstrates how ox-lexical handles media nodes. These example
+files are small enough to commit to the repository.
+
+** Image
+
+Images are linked using standard org-mode syntax:
+
+[[file:example-image.png][ox-lexical gradient banner]]
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_EXAMPLE
+[[file:example-image.png][ox-lexical gradient banner]]
+#+END_EXAMPLE
+#+END_TOGGLE
+
+** Audio
+
+Audio uses the =#+BEGIN_AUDIO= special block:
+
+#+BEGIN_AUDIO :src example-audio.mp3
+A simple 440Hz beep - the classic test tone.
+#+END_AUDIO
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_EXAMPLE
+,#+BEGIN_AUDIO :src example-audio.mp3
+A simple 440Hz beep - the classic test tone.
+,#+END_AUDIO
+#+END_EXAMPLE
+#+END_TOGGLE
+
+** Video
+
+Video uses the =#+BEGIN_VIDEO= special block:
+
+#+BEGIN_VIDEO :src example-video.mp4
+A minimal 2-second video showing the ox-lexical branding.
+#+END_VIDEO
+
+#+BEGIN_TOGGLE :heading "Org Source"
+#+BEGIN_EXAMPLE
+,#+BEGIN_VIDEO :src example-video.mp4
+A minimal 2-second video showing the ox-lexical branding.
+,#+END_VIDEO
+#+END_EXAMPLE
+#+END_TOGGLE
+
+* Generation Commands
+
+These example files were generated with:
+
+#+BEGIN_SRC shell :eval no
+# Audio: 1-second 440Hz tone
+ffmpeg -f lavfi -i "sine=frequency=440:duration=1" \
+  -c:a libmp3lame -q:a 9 example-audio.mp3
+
+# Image: 200x100 gradient with text
+magick -size 200x100 "gradient:#667eea-#764ba2" \
+  -font Helvetica -pointsize 16 -fill white \
+  -gravity center -annotate +0+0 "ox-lexical" example-image.png
+
+# Video: 2-second 160x90 with text overlay
+ffmpeg -f lavfi -i "color=c=#667eea:s=160x90:d=2" \
+  -vf "drawtext=text='ox-lexical':fontsize=14:fontcolor=white:x=(w-tw)/2:y=(h-th)/2" \
+  -c:v libx264 -preset ultrafast -crf 28 -pix_fmt yuv420p example-video.mp4
+#+END_SRC
+
+Total size: ~12KB - small enough to commit to the repository.

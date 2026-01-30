@@ -1,0 +1,16 @@
+{
+  "title": "From Org to Ghost: A Publishing Journey",
+  "slug": "org-to-ghost-publishing-journey",
+  "type": "post",
+  "status": "draft",
+  "visibility": "public",
+  "tags": [
+    "org-mode",
+    "ghost",
+    "tutorial",
+    "ox-lexical"
+  ],
+  "author": "ii.coop",
+  "date": "2026-01-29",
+  "excerpt": "Discover how org-mode transforms into beautiful Ghost posts—with dynamically generated media."
+}

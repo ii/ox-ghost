@@ -1,0 +1,466 @@
+#+TITLE: ox-lexical: Org-mode to Ghost Lexical JSON Exporter
+#+AUTHOR: ii.coop
+#+DATE: 2026-01-28
+
+* Overview
+
+=ox-lexical= is an Emacs org-mode export backend that converts org files to
+Ghost's Lexical JSON format, enabling direct publishing to Ghost CMS.
+
+* Installation
+
+** Emacs
+
+Load the elisp file in Emacs:
+
+#+BEGIN_SRC elisp
+(load "/path/to/ox-lexical/ox-lexical.el")
+#+END_SRC
+
+** Node.js Validator (optional)
+
+For local validation with Ghost's renderer:
+
+#+BEGIN_SRC bash
+cd /path/to/ox-lexical
+npm install
+#+END_SRC
+
+* Usage
+
+** Interactive
+
+- =M-x org-lexical-export-as-json= - Export to buffer
+- =M-x org-lexical-export-to-file= - Export to .json file
+
+** Shell Script
+
+#+BEGIN_SRC bash
+# Export org file to JSON
+./org-to-lexical.sh input.org output.json
+#+END_SRC
+
+** Batch Mode (direct emacs)
+
+#+BEGIN_SRC bash
+emacs --batch -Q \
+  --eval "(require 'org)" \
+  --eval "(require 'ox-html)" \
+  -l ox-lexical.el \
+  --visit input.org \
+  --eval "(princ (org-export-as 'lexical))"
+#+END_SRC
+
+** Validation
+
+Validate exported JSON using Ghost's actual renderer:
+
+#+BEGIN_SRC bash
+# Validate JSON
+node validate-lexical.js output.json
+
+# Validate and generate HTML preview
+node validate-lexical.js output.json --html preview.html
+
+# Validate directly from org file (exports first)
+node validate-lexical.js input.org --html preview.html
+
+# Quiet mode for scripting (outputs JSON stats)
+node validate-lexical.js output.json --quiet
+#+END_SRC
+
+* Supported Node Types
+
+** Standard Org Elements → Lexical Nodes
+
+| Org Element        | Lexical Node   | Notes                          |
+|--------------------+----------------+--------------------------------|
+| =* Heading=        | heading        | Level 1 → h2, Level 2 → h3 etc |
+| Paragraph          | paragraph      | With inline formatting         |
+| =*bold*=           | text (format=1) | Bitmask format                |
+| =/italic/=         | text (format=2) |                               |
+| =_underline_=      | text (format=8) |                               |
+| =+strikethrough+=  | text (format=4) |                               |
+| ~=code=~           | text (format=16) | Inline code                  |
+| =[[url][desc]]=    | link           | With nested text children      |
+| =[[file:img.jpg]]= | image          | Detected by extension          |
+| =- item=           | list/listitem  | bullet or number listType      |
+| =-----=            | horizontalrule |                                |
+| =#+BEGIN_QUOTE=    | quote          |                                |
+| =#+BEGIN_SRC=      | codeblock      | With language                  |
+| =#+BEGIN_EXAMPLE=  | codeblock      | language="text"                |
+| =#+BEGIN_EXPORT=   | html/raw       | HTML or raw Lexical JSON       |
+
+** Special Blocks → Ghost Cards
+
+*** Callout
+
+#+BEGIN_SRC org
+,#+BEGIN_CALLOUT :emoji 🎉 :color green
+Your callout text here.
+,#+END_CALLOUT
+#+END_SRC
+
+Properties:
+- =:emoji= - Emoji icon (default: 💡)
+- =:color= - Background color: blue, green, yellow, red, pink, purple, grey (default: blue)
+
+*** Toggle
+
+#+BEGIN_SRC org
+,#+BEGIN_TOGGLE :heading "Click to expand"
+Hidden content revealed on click.
+,#+END_TOGGLE
+#+END_SRC
+
+Properties:
+- =:heading= - Toggle header text (required)
+
+*** Button
+
+#+BEGIN_SRC org
+,#+BEGIN_BUTTON :url https://example.com :alignment center
+Button Text
+,#+END_BUTTON
+#+END_SRC
+
+Properties:
+- =:url= - Button link URL (required)
+- =:alignment= - left, center, right (default: center)
+
+*** Aside
+
+#+BEGIN_SRC org
+,#+BEGIN_ASIDE
+Secondary content in an aside.
+,#+END_ASIDE
+#+END_SRC
+
+*** Gallery
+
+#+BEGIN_SRC org
+,#+BEGIN_GALLERY :images "img1.jpg, img2.jpg, img3.jpg"
+,#+END_GALLERY
+#+END_SRC
+
+Properties:
+- =:images= - Comma-separated list of image URLs
+
+*** Video
+
+#+BEGIN_SRC org
+,#+BEGIN_VIDEO :src https://example.com/video.mp4
+,#+END_VIDEO
+#+END_SRC
+
+Properties:
+- =:src= - Video URL (required)
+
+*** Audio
+
+#+BEGIN_SRC org
+,#+BEGIN_AUDIO :src https://example.com/audio.mp3
+Episode Title
+,#+END_AUDIO
+#+END_SRC
+
+Properties:
+- =:src= - Audio URL (required)
+
+*** Embed
+
+#+BEGIN_SRC org
+,#+BEGIN_EMBED :url https://twitter.com/example/status/123
+Tweet preview text
+,#+END_EMBED
+#+END_SRC
+
+Properties:
+- =:url= - Embed URL (required)
+
+*** Bookmark
+
+#+BEGIN_SRC org
+,#+BEGIN_BOOKMARK :url https://example.com
+Bookmark Title
+,#+END_BOOKMARK
+#+END_SRC
+
+Properties:
+- =:url= - Bookmark URL (required)
+
+*** File Download
+
+#+BEGIN_SRC org
+,#+BEGIN_FILE :src https://example.com/doc.pdf :fileName "Document.pdf"
+File description
+,#+END_FILE
+#+END_SRC
+
+Properties:
+- =:src= - File URL (required)
+- =:fileName= - Display filename
+
+*** Product
+
+#+BEGIN_SRC org
+,#+BEGIN_PRODUCT :url https://shop.example.com :buttonText "Buy Now"
+Product Name
+,#+END_PRODUCT
+#+END_SRC
+
+Properties:
+- =:url= - Product URL
+- =:buttonText= - CTA button text
+
+*** Signup Form
+
+#+BEGIN_SRC org
+,#+BEGIN_SIGNUP :layout regular :buttonText "Subscribe Now"
+,#+END_SIGNUP
+#+END_SRC
+
+Properties:
+- =:layout= - regular, wide, split (default: regular)
+- =:buttonText= - Button text (default: Subscribe)
+
+*** Call to Action
+
+#+BEGIN_SRC org
+,#+BEGIN_CTA :layout minimal :buttonText "Learn More" :url https://example.com
+Your CTA text here.
+,#+END_CTA
+#+END_SRC
+
+Properties:
+- =:layout= - minimal, immersive, split (default: minimal)
+- =:buttonText= - Button text (default: Learn more)
+- =:url= - Button link URL
+
+*** Header Card
+
+#+BEGIN_SRC org
+,#+BEGIN_HEADER :size small
+Header Text
+,#+END_HEADER
+#+END_SRC
+
+Properties:
+- =:size= - small, medium, large (default: small)
+
+*** Transistor Podcast
+
+#+BEGIN_SRC org
+,#+BEGIN_TRANSISTOR :url https://share.transistor.fm/e/episode-id
+,#+END_TRANSISTOR
+#+END_SRC
+
+Properties:
+- =:url= - Transistor episode URL
+
+*** Email-only Content
+
+#+BEGIN_SRC org
+,#+BEGIN_EMAIL
+Content only visible in email newsletters.
+,#+END_EMAIL
+#+END_SRC
+
+*** REPL Block (Code + Output)
+
+Wrap source code with its output using configurable styles:
+
+**** Simple (default)
+#+BEGIN_SRC org
+,#+BEGIN_REPL
+,#+BEGIN_SRC python
+print("Hello!")
+,#+END_SRC
+
+,#+RESULTS:
+: Hello!
+,#+END_REPL
+#+END_SRC
+
+Outputs consecutive codeblocks (source + output).
+
+**** Labeled
+#+BEGIN_SRC org
+,#+BEGIN_REPL :style labeled :label "Result"
+,#+BEGIN_SRC python
+x = 2 + 2
+print(x)
+,#+END_SRC
+
+,#+RESULTS:
+: 4
+,#+END_REPL
+#+END_SRC
+
+Adds a label paragraph before the output.
+
+**** Callout
+#+BEGIN_SRC org
+,#+BEGIN_REPL :style callout :emoji 💻 :color green
+,#+BEGIN_SRC shell
+uname -a
+,#+END_SRC
+
+,#+RESULTS:
+: Linux host 6.1.0 x86_64
+,#+END_REPL
+#+END_SRC
+
+Wraps output in a colored callout box.
+
+**** Toggle
+#+BEGIN_SRC org
+,#+BEGIN_REPL :style toggle :heading "Python Example"
+,#+BEGIN_SRC python
+for i in range(3):
+    print(i)
+,#+END_SRC
+
+,#+RESULTS:
+: 0
+: 1
+: 2
+,#+END_REPL
+#+END_SRC
+
+Puts code in a collapsible toggle, output follows after.
+
+**** Aside
+#+BEGIN_SRC org
+,#+BEGIN_REPL :style aside
+,#+BEGIN_SRC elisp
+(message "Hello!")
+,#+END_SRC
+
+,#+RESULTS:
+: Hello!
+,#+END_REPL
+#+END_SRC
+
+Wraps everything in an aside block.
+
+Properties:
+- =:style= - simple, labeled, callout, toggle, aside (default: simple)
+- =:label= - Label text for labeled style (default: "Output")
+- =:emoji= - Emoji for callout style (default: 📤)
+- =:color= - Color for callout style (default: grey)
+- =:heading= - Heading for toggle style (default: "Code (language)")
+
+* Image Attributes
+
+Use =#+ATTR_LEXICAL= to set image properties:
+
+#+BEGIN_SRC org
+,#+ATTR_LEXICAL: :cardWidth wide
+[[file:photo.jpg][Alt text for the image]]
+#+END_SRC
+
+Properties:
+- =:cardWidth= - regular, wide, full (default: regular)
+
+* Raw Lexical JSON
+
+Insert raw Lexical JSON directly:
+
+#+BEGIN_SRC org
+,#+BEGIN_EXPORT lexical
+{"type":"paragraph","version":1,"children":[...]}
+,#+END_EXPORT
+#+END_SRC
+
+* Format Bitmask Reference
+
+Text formatting uses a bitmask:
+
+| Format        | Value | Example                    |
+|---------------+-------+----------------------------|
+| Normal        |     0 | Plain text                 |
+| Bold          |     1 | *bold*                     |
+| Italic        |     2 | /italic/                   |
+| Strikethrough |     4 | +strikethrough+            |
+| Underline     |     8 | _underline_                |
+| Code          |    16 | =code=                     |
+| Bold+Italic   |     3 | */bold italic/*            |
+
+* Node Type Summary
+
+Ghost Koenig editor supports these node types (from [[https://github.com/TryGhost/Koenig][TryGhost/Koenig]]):
+
+| Category     | Node Types                                              |
+|--------------+---------------------------------------------------------|
+| Text         | heading, paragraph, quote, aside, ExtendedText          |
+| Lists        | list, listitem                                          |
+| Code         | codeblock                                               |
+| Media        | image, gallery, video, audio, file                      |
+| Embeds       | embed, bookmark, transistor                             |
+| Interactive  | button, toggle, callout, call-to-action, signup         |
+| Commerce     | product, paywall                                        |
+| Layout       | horizontalrule, header                                  |
+| Special      | html, markdown, email, email-cta                        |
+
+* Files
+
+| File                 | Purpose                                    |
+|----------------------+--------------------------------------------|
+| =ox-lexical.el=      | Emacs org-mode export backend              |
+| =org-to-lexical.sh=  | Shell wrapper for batch export             |
+| =validate-lexical.js= | Validation with Ghost's renderer          |
+| =package.json=       | npm dependencies for validator             |
+| =STYLE-GUIDE.org=    | Authoring best practices                   |
+| =test-*.org=         | Test files                                 |
+
+* Version History
+
+** 0.6.0 (2026-01-29)
+- Added bundled Ghost renderer for local validation
+- Added =validate-lexical.js= tool
+- Added =STYLE-GUIDE.org= authoring guide
+- Renamed module to =ox-lexical=
+
+** 0.5.0 (2026-01-29)
+- Added REPL block for code + output with 5 styles (simple, labeled, callout, toggle, aside)
+- Added fixed-width element support (: prefix results)
+- Fixed post-blank spacing between formatted elements
+- Fixed nil return values causing "wrong-type-argument stringp" errors
+
+** 0.4.0 (2026-01-28)
+- Added support for all Ghost card types
+- Fixed JSON null/false encoding
+- Improved parameter parsing for URLs and multi-word values
+- Matched Ghost node property names exactly
+
+** 0.3.0 (2026-01-28)
+- Marker-based JSON assembly approach
+- Basic node support
+
+* Ghost Publishing Workflow
+
+For a complete publishing workflow with media generation and enrichment, see =ghost-publish.el=.
+
+** Quick Start
+
+#+BEGIN_SRC elisp
+(require 'ghost-publish)
+#+END_SRC
+
+** Phases
+
+| Phase    | Command                  | Purpose                        |
+|----------+--------------------------+--------------------------------|
+| Generate | =ghost-tts=, =ghost-image=, =ghost-video= | Create media, upload to Ghost |
+| Enrich   | =M-x ghost-enrich-buffer= | Add metadata to media blocks   |
+| Preview  | =M-x ghost-preview=       | View HTML locally              |
+| Publish  | =M-x ghost-publish=       | Send to Ghost as draft         |
+
+See [[file:ghost-publish.org][ghost-publish.org]] for complete documentation.
+
+* Resources
+
+- [[https://ghost.org/docs/editor/][Ghost Editor Documentation]]
+- [[https://github.com/TryGhost/Koenig][Ghost Koenig Editor Source]]
+- [[https://lexical.dev/][Lexical Framework]]

@@ -1,0 +1,35 @@
+#+TITLE: Testing Ghost Metadata Export
+#+AUTHOR: ii.coop
+#+DATE: 2025-01-29
+#+DESCRIPTION: A test post demonstrating Ghost metadata extraction
+
+#+GHOST_SLUG: test-ghost-metadata
+#+GHOST_TYPE: post
+#+GHOST_STATUS: draft
+#+GHOST_VISIBILITY: public
+#+GHOST_TAGS: ox-lexical, testing, emacs
+#+GHOST_FEATURED: false
+#+GHOST_EXCERPT: Testing the ox-lexical export with full Ghost metadata support.
+
+* Introduction
+
+This is a test document for the ~ox-lexical~ Ghost metadata export feature.
+
+** Features Being Tested
+
+- Title and slug extraction
+- Tag parsing (comma-separated)
+- Status and visibility settings
+- Author and date from org keywords
+
+* Code Example
+
+Here's a simple example:
+
+#+begin_src elisp
+(message "Hello from ox-lexical!")
+#+end_src
+
+* Conclusion
+
+If this exports correctly, both the =.json= and =-metadata.json= files should be created.

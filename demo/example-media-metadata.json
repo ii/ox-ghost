@@ -1,0 +1,15 @@
+{
+  "title": "ox-lexical Media Examples",
+  "slug": "ox-lexical-media-examples",
+  "type": "post",
+  "status": "draft",
+  "visibility": "public",
+  "tags": [
+    "ox-lexical",
+    "demo",
+    "media"
+  ],
+  "author": "ii.coop",
+  "date": "2026-01-30",
+  "excerpt": "Demonstrates audio, video, and image embedding in ox-lexical"
+}

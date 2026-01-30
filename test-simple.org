@@ -1,0 +1,27 @@
+#+TITLE: Simple Test
+
+* First Heading
+
+This is a paragraph with *bold*, /italic/, and =code= text.
+
+** Second Level
+
+Here's a [[https://example.com][link to example]].
+
+- Item one
+- Item two
+- Item three
+
+#+BEGIN_QUOTE
+This is a quote block.
+#+END_QUOTE
+
+#+BEGIN_SRC python
+print("Hello, world!")
+#+END_SRC
+
+-----
+
+#+BEGIN_CALLOUT :emoji 💡 :color blue
+This is a callout!
+#+END_CALLOUT

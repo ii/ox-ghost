@@ -1,0 +1,455 @@
+#+TITLE: Org-Lexical Style Guide
+#+AUTHOR: ii.coop
+#+DESCRIPTION: Authoring patterns for beautiful Ghost posts from org-mode
+
+* Introduction
+
+This guide captures best practices for writing org-mode documents that export
+beautifully to Ghost via the ox-lexical exporter.
+
+Lexical documents are a *flat list of nodes* - headings don't contain content,
+they're just styled markers. Understanding this helps you structure content
+that renders well.
+
+* Document Structure
+
+** Heading Levels
+
+| Org Level | Lexical | Usage |
+|-----------+---------+---------------------------------------|
+| =*= | H2 | Major sections (H1 is post title) |
+| =**= | H3 | Subsections |
+| =***= | H4 | Sub-subsections (use sparingly) |
+| =****= | H5 | Rarely needed |
+| =*****= | H6 | Avoid - too deep |
+
+Ghost posts typically use H2 for sections, H3 for subsections.
+Deeper nesting often signals content should be restructured.
+
+** Front Matter
+
+#+begin_example
+,#+TITLE: Your Post Title
+,#+AUTHOR: Your Name
+,#+DATE: 2024-01-29
+,#+PROPERTY: header-args :eval never-export
+#+end_example
+
+The =:eval never-export= prevents babel re-execution during Stage 2 export.
+
+* Code Blocks
+
+** Line Width
+
+Keep code lines under *80 characters* to avoid horizontal scrollbars.
+Ghost's content area fits ~80-90 monospace characters.
+
+| Width | Usage |
+|-------+----------------------------------------|
+| 72 | Strict - fits all displays |
+| 80 | Standard - recommended maximum |
+| 100 | Extended - may scroll on narrow views |
+
+** Copy Button
+
+Code blocks automatically include a copy-to-clipboard button (via Prism.js
+toolbar plugin). No special markup needed.
+
+** Basic Pattern
+
+Code followed by explanation reads naturally:
+
+#+begin_example
+,#+BEGIN_SRC python
+result = compute_something()
+print(result)
+,#+END_SRC
+
+The function returns the computed value...
+#+end_example
+
+** With Results
+
+Results flow directly after code - no heading needed:
+
+#+begin_example
+,#+BEGIN_SRC shell :results output
+echo "Hello from $(hostname)"
+,#+END_SRC
+
+,#+RESULTS:
+: Hello from myserver
+#+end_example
+
+** Named Blocks (Decoupled Generation)
+
+Use =#+NAME:= to create reusable, named code blocks that can be called
+from anywhere in the document. This decouples generation from display.
+
+#+begin_example
+,#+NAME: greeting-generator
+,#+BEGIN_SRC elisp :var name="World"
+(format "Hello, %s!" name)
+,#+END_SRC
+#+end_example
+
+Then reference it elsewhere with =#+CALL:=:
+
+#+begin_example
+,#+CALL: greeting-generator(name="Ghost")
+
+,#+RESULTS:
+: Hello, Ghost!
+#+end_example
+
+** Hidden Generation Sections
+
+For complex documents, create a =:noexport:= section for all generators:
+
+#+begin_example
+,* Generators :noexport:
+
+,#+NAME: make-list
+,#+BEGIN_SRC elisp :var items='()
+(mapconcat (lambda (i) (format "- %s" i)) items "\n")
+,#+END_SRC
+
+,#+NAME: make-table
+,#+BEGIN_SRC elisp :var headers='() :var rows='()
+;; Table generation logic...
+,#+END_SRC
+
+,* Visible Content
+
+Features:
+,#+CALL: make-list(items='("Fast" "Reliable" "Beautiful"))
+#+end_example
+
+This pattern keeps generation logic separate from content structure.
+
+** #+CALL: Syntax
+
+Full syntax for calling named blocks:
+
+#+begin_example
+,#+CALL: block-name(arg1=value1, arg2=value2)
+
+;; With header args:
+,#+CALL: block-name() :results raw
+
+;; Inline in text:
+This value is call_block-name()[:results raw].
+#+end_example
+
+* REPL Blocks (Code + Output Styles)
+
+Wrap code and results in REPL blocks for styled presentation.
+
+** Simple (default)
+
+Pass-through, no styling. Good for quick examples.
+
+#+begin_example
+,#+BEGIN_REPL
+,#+BEGIN_SRC python
+2 + 2
+,#+END_SRC
+
+,#+RESULTS:
+: 4
+,#+END_REPL
+#+end_example
+
+** Labeled
+
+Adds a label before output. Good for teaching.
+
+#+begin_example
+,#+BEGIN_REPL :style labeled :label "Output"
+,#+BEGIN_SRC python
+print("Hello")
+,#+END_SRC
+
+,#+RESULTS:
+: Hello
+,#+END_REPL
+#+end_example
+
+** Callout
+
+Wraps output in a colored callout. Use when output is the point.
+
+#+begin_example
+,#+BEGIN_REPL :style callout :emoji "checkmark" :color green
+,#+BEGIN_SRC shell
+./deploy.sh && echo "Success!"
+,#+END_SRC
+
+,#+RESULTS:
+: Success!
+,#+END_REPL
+#+end_example
+
+** Toggle
+
+Code in collapsible toggle, output visible. Good for long code.
+
+#+begin_example
+,#+BEGIN_REPL :style toggle :heading "Implementation Details"
+,#+BEGIN_SRC python
+# Long implementation here...
+def complex_function():
+    pass
+,#+END_SRC
+
+,#+RESULTS:
+: Function defined
+,#+END_REPL
+#+end_example
+
+** Aside
+
+Wraps everything in aside styling. For tangential examples.
+
+#+begin_example
+,#+BEGIN_REPL :style aside
+,#+BEGIN_SRC python
+# Alternative approach...
+,#+END_SRC
+
+,#+RESULTS:
+: ...
+,#+END_REPL
+#+end_example
+
+* When to Use What
+
+| Situation | Recommended Style |
+|----------------------------------------+-------------------|
+| Quick example, inline | simple |
+| Teaching concept, show input/output | labeled |
+| Important result (success, error, key) | callout |
+| Long code readers can skip | toggle |
+| "By the way" alternative approach | aside |
+| Regular code, no special treatment | no wrapper |
+
+* Callout Blocks
+
+Use for tips, warnings, and important notes - not for regular content.
+
+#+begin_example
+,#+BEGIN_CALLOUT :emoji warning :color yellow
+Be careful with this approach in production!
+,#+END_CALLOUT
+#+end_example
+
+| Color | Emoji | Usage |
+|--------+---------+-------------------|
+| blue | bulb | Info, tips |
+| yellow | warning | Caution |
+| green | check | Success, do this |
+| red | x | Error, don't |
+| grey | | Neutral note |
+
+* Toggle Blocks
+
+For content readers can skip:
+
+#+begin_example
+,#+BEGIN_TOGGLE :heading "Technical Details"
+Extended explanation that most readers don't need...
+,#+END_TOGGLE
+#+end_example
+
+* Aside Blocks
+
+For tangential information:
+
+#+begin_example
+,#+BEGIN_ASIDE
+*Note:* This also works with the older API, though it's deprecated.
+,#+END_ASIDE
+#+end_example
+
+* Images
+
+#+begin_example
+,#+ATTR_LEXICAL: :cardWidth wide
+[[./images/screenshot.png][Alt text description]]
+#+end_example
+
+Card widths: =regular=, =wide=, =full=
+
+* Links
+
+#+begin_example
+External: [[https://ghost.org][Ghost CMS]]
+Internal: [[file:other-post.org][Related Post]]
+Plain URL: https://example.com (auto-linked)
+#+end_example
+
+* Lists
+
+Org lists map directly to Lexical lists:
+
+#+begin_example
+- Unordered item
+- Another item
+  - Nested item
+
+1. Ordered item
+2. Another item
+   1. Nested numbered
+#+end_example
+
+* Tables
+
+Tables export as HTML blocks (Lexical doesn't have native tables):
+
+#+begin_example
+| Name | Value |
+|------+-------|
+| Foo | 42 |
+| Bar | 17 |
+#+end_example
+
+* General Principles
+
+1. *One idea per section* - Don't overload headings
+2. *Code then explain* - Show the code, then discuss it
+3. *Callouts are seasoning* - Use sparingly for impact
+4. *Toggles hide complexity* - Let readers choose depth
+5. *Asides are whispers* - Brief tangents, not main content
+6. *Flat is fine* - Don't over-nest; Lexical is flat anyway
+
+* Decoupled Generation Patterns
+
+** Pattern 1: Named + CALL
+
+Define once, use anywhere. Good for repeated elements.
+
+#+begin_example
+,* Setup :noexport:
+,#+NAME: version-badge
+,#+BEGIN_SRC elisp :var v="1.0.0" :var status="stable"
+(format "[[https://img.shields.io/badge/v%s-%s-green]]" v status)
+,#+END_SRC
+
+,* Introduction
+Current version: call_version-badge(v="2.1.0", status="beta")[:results raw]
+
+,* Changelog
+Version call_version-badge(v="2.0.0")[:results raw] added...
+#+end_example
+
+** Pattern 2: Results Placement with #+NAME:
+
+Name your results block to place output away from source:
+
+#+begin_example
+,#+NAME: stats-output
+,#+RESULTS: generate-stats
+
+,* Appendix :noexport:
+,#+NAME: generate-stats
+,#+BEGIN_SRC python :results output
+print("Generated statistics...")
+,#+END_SRC
+#+end_example
+
+** Pattern 3: Literate Code Assembly
+
+Build code from named fragments:
+
+#+begin_example
+,#+NAME: imports
+,#+BEGIN_SRC python :exports none
+import json
+import requests
+,#+END_SRC
+
+,#+NAME: main-logic
+,#+BEGIN_SRC python :exports none :noweb yes
+def fetch_data(url):
+    return requests.get(url).json()
+,#+END_SRC
+
+,* The Complete Script
+,#+BEGIN_SRC python :noweb yes :tangle script.py
+<<imports>>
+<<main-logic>>
+if __name__ == "__main__":
+    print(fetch_data("https://api.example.com"))
+,#+END_SRC
+#+end_example
+
+** Pattern 4: Conditional Content
+
+Generate content based on document variables:
+
+#+begin_example
+,#+NAME: audience
+: developers
+
+,#+NAME: intro-for-audience
+,#+BEGIN_SRC elisp :var audience="general"
+(pcase audience
+  ("developers" "This guide assumes familiarity with git and CLI.")
+  ("designers" "No coding required - we'll use the visual editor.")
+  (_ "Welcome to our platform!"))
+,#+END_SRC
+
+,* Introduction
+,#+CALL: intro-for-audience(audience=(org-entry-get nil "audience" t))
+#+end_example
+
+* Anti-Patterns
+
+** Too Many Headings
+
+Bad:
+#+begin_example
+,* Setup
+,** Installing
+,*** Step 1
+,**** Download
+#+end_example
+
+Better:
+#+begin_example
+,* Setup
+
+,** Installing
+
+Download the package...
+#+end_example
+
+** Callout Overload
+
+Bad: Every other paragraph is a callout
+
+Good: One or two callouts per major section
+
+** Unexplained Code
+
+Bad:
+#+begin_example
+,#+BEGIN_SRC python
+x = foo(bar(baz(y)))
+,#+END_SRC
+,#+BEGIN_SRC python
+z = transform(x)
+,#+END_SRC
+#+end_example
+
+Better: Add context between code blocks
+
+* Version History
+
+| Version | Date       | Changes                                    |
+|---------+------------+--------------------------------------------|
+| 0.1.0   | 2024-01-29 | Initial style guide                        |
+| 0.2.0   | 2026-01-29 | Added decoupled generation patterns        |
+|         |            | Added line width guidelines (80 char max)  |
+|         |            | Added #+NAME: and #+CALL: documentation    |
+|         |            | Added copy button note (Prism.js toolbar)  |
