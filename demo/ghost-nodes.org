@@ -4,16 +4,17 @@
 #+DESCRIPTION: A self-documenting guide to every Ghost Lexical node type with org-mode source examples
 
 #+GHOST_SLUG: ghost-nodes
-#+GHOST_STATUS: draft
+#+GHOST_STATUS: published
 #+GHOST_VISIBILITY: public
 #+GHOST_TAGS: ox-ghost, org-mode, ghost, reference, documentation
 #+GHOST_EXCERPT: A self-documenting guide to every Ghost Lexical node type with org-mode source examples. See the rendered result, then click to view the org-mode code that produces it.
 #+GHOST_ID: 697ca2273c8ddf0001728db3
 #+GHOST_UUID: 34fced39-9909-4e87-9b26-0b0d411cff4a
 #+GHOST_IMAGE: https://www.ii.coop/content/images/2026/01/ghost-nodes.jpg
-#+GHOST_URL: https://www.ii.coop/p/34fced39-9909-4e87-9b26-0b0d411cff4a/
+#+GHOST_URL: https://www.ii.coop/ghost-nodes/
 #+GHOST_CREATED_AT: 2026-01-30T12:20:55.000Z
-#+GHOST_UPDATED_AT: 2026-01-31T11:43:21.000Z
+#+GHOST_UPDATED_AT: 2026-01-31T11:57:18.000Z
+#+GHOST_PUBLISHED_AT: 2026-01-31T11:57:18.000Z
 
 #+PROPERTY: header-args :eval never-export
 
