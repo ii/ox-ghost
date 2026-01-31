@@ -4,13 +4,20 @@
 #+DESCRIPTION: A self-documenting guide to every Ghost Lexical node type with org-mode source examples
 
 #+GHOST_SLUG: ghost-nodes
-#+GHOST_TYPE: post
 #+GHOST_STATUS: draft
 #+GHOST_VISIBILITY: public
 #+GHOST_TAGS: ox-ghost, org-mode, ghost, reference, documentation
 #+GHOST_EXCERPT: A self-documenting guide to every Ghost Lexical node type with org-mode source examples. See the rendered result, then click to view the org-mode code that produces it.
+#+GHOST_ID: 697ca2273c8ddf0001728db3
+#+GHOST_UUID: 34fced39-9909-4e87-9b26-0b0d411cff4a
+#+GHOST_IMAGE: https://www.ii.coop/content/images/2026/01/ox-ghost.jpeg
+#+GHOST_URL: https://www.ii.coop/p/34fced39-9909-4e87-9b26-0b0d411cff4a/
+#+GHOST_CREATED_AT: 2026-01-30T12:20:55.000Z
+#+GHOST_UPDATED_AT: 2026-01-31T11:43:21.000Z
 
 #+PROPERTY: header-args :eval never-export
+
+[[https://www.ii.coop/content/files/2026/01/ghost-nodes.org][ghost-nodes.org]] ==> [[https://github.com/ii/ox-ghost][ox-ghost]] ==> https://ghost-nodes.ii.coop
 
 * Introduction
 
@@ -293,56 +300,87 @@ echo "Hello from $(hostname)"
 
 Callouts highlight important information with color-coded backgrounds.
 
+** All Nine Colors
+
 #+BEGIN_CALLOUT :emoji "💡" :color blue
-*Blue* (=:color blue=) — Tips, information, general highlights.
-Default color if not specified.
+*Blue* — Tips, information, general highlights. Default color.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "✅" :color green
+*Green* — Success, best practices, "do this".
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "⚠️" :color yellow
+*Yellow* — Warnings, caution, pay attention.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "❌" :color red
+*Red* — Errors, danger, "don't do this".
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "✨" :color purple
+*Purple* — Special features, highlights.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "🎨" :color pink
+*Pink* — Creative, playful content.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "📝" :color grey
+*Grey* — Neutral notes, supplementary info.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "📋" :color white
+*White* — Transparent with subtle border.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "🏷️" :color accent
+*Accent* — Site's brand/accent color.
 #+END_CALLOUT
 
 #+BEGIN_TOGGLE :heading "Org Source"
 #+BEGIN_SRC org
 ,#+BEGIN_CALLOUT :emoji "💡" :color blue
-Your message here. Supports *formatting*.
+*Blue* — Tips, information, general highlights. Default color.
+,#+END_CALLOUT
+
+,#+BEGIN_CALLOUT :emoji "✅" :color green
+*Green* — Success, best practices, "do this".
+,#+END_CALLOUT
+
+,#+BEGIN_CALLOUT :emoji "⚠️" :color yellow
+*Yellow* — Warnings, caution, pay attention.
+,#+END_CALLOUT
+
+,#+BEGIN_CALLOUT :emoji "❌" :color red
+*Red* — Errors, danger, "don't do this".
+,#+END_CALLOUT
+
+,#+BEGIN_CALLOUT :emoji "✨" :color purple
+*Purple* — Special features, highlights.
+,#+END_CALLOUT
+
+,#+BEGIN_CALLOUT :emoji "🎨" :color pink
+*Pink* — Creative, playful content.
+,#+END_CALLOUT
+
+,#+BEGIN_CALLOUT :emoji "📝" :color grey
+*Grey* — Neutral notes, supplementary info.
+,#+END_CALLOUT
+
+,#+BEGIN_CALLOUT :emoji "📋" :color white
+*White* — Transparent with subtle border.
+,#+END_CALLOUT
+
+,#+BEGIN_CALLOUT :emoji "🏷️" :color accent
+*Accent* — Site's brand/accent color.
 ,#+END_CALLOUT
 #+END_SRC
 #+END_TOGGLE
 
-** All Seven Colors
-
-#+BEGIN_CALLOUT :emoji "✅" :color green
-*Green* (=:color green=) — Success, best practices, "do this".
+#+BEGIN_CALLOUT :emoji "📋" :color grey
+*Properties:* =:emoji= (any Unicode emoji), =:color= (blue, green, yellow, red, purple, pink, grey, white, accent)
 #+END_CALLOUT
-
-#+BEGIN_CALLOUT :emoji "⚠️" :color yellow
-*Yellow* (=:color yellow=) — Warnings, caution, pay attention.
-#+END_CALLOUT
-
-#+BEGIN_CALLOUT :emoji "❌" :color red
-*Red* (=:color red=) — Errors, danger, "don't do this".
-#+END_CALLOUT
-
-#+BEGIN_CALLOUT :emoji "✨" :color purple
-*Purple* (=:color purple=) — Special features, highlights.
-#+END_CALLOUT
-
-#+BEGIN_CALLOUT :emoji "🎨" :color pink
-*Pink* (=:color pink=) — Creative, playful content.
-#+END_CALLOUT
-
-#+BEGIN_CALLOUT :emoji "📝" :color grey
-*Grey* (=:color grey=) — Neutral notes, supplementary info.
-#+END_CALLOUT
-
-** Common Emoji Names
-
-| Emoji | Name               | Use Case         |
-|-------+--------------------+------------------|
-| 💡    | =bulb=             | Tips, ideas      |
-| ✅    | =white_check_mark= | Success, do this |
-| ⚠️    | =warning=          | Caution          |
-| ❌    | =x=                | Error, don't     |
-| 🚀    | =rocket=           | Launch, deploy   |
-| 📝    | =memo=             | Notes            |
-| ✨    | =sparkles=         | Special          |
 
 * Toggle Blocks
 
@@ -356,6 +394,14 @@ print("Code inside a toggle!")
 #+END_SRC
 #+END_TOGGLE
 
+#+BEGIN_TOGGLE :heading "Toggle with a list"
+Toggles are great for:
+- FAQs
+- Technical details
+- Optional deep-dives
+- Spoiler warnings
+#+END_TOGGLE
+
 #+BEGIN_TOGGLE :heading "Org Source"
 #+BEGIN_SRC org
 ,#+BEGIN_TOGGLE :heading "Click to expand"
@@ -365,32 +411,63 @@ Hidden content here. Supports *formatting*, lists, and code:
 print("Code inside a toggle!")
 ,#+END_SRC
 ,#+END_TOGGLE
-#+END_SRC
-#+END_TOGGLE
 
-#+BEGIN_TOGGLE :heading "Toggle with a list"
+,#+BEGIN_TOGGLE :heading "Toggle with a list"
 Toggles are great for:
 - FAQs
 - Technical details
 - Optional deep-dives
 - Spoiler warnings
+,#+END_TOGGLE
+#+END_SRC
 #+END_TOGGLE
+
+#+BEGIN_CALLOUT :emoji "📋" :color grey
+*Properties:* =:heading= (required, the clickable title)
+#+END_CALLOUT
 
 * Aside Blocks
 
-Asides provide tangential information with distinct styling.
+Asides render as large, emphasized block quotes — typically used for pull quotes
+or tangential information. Unlike callouts, asides have no color or emoji options.
 
 #+BEGIN_ASIDE
-Tangential content here. Supports *formatting* and [[https://ghost.org][links]].
+Asides are minimal containers. They use Ghost's =kg-blockquote-alt= class which
+renders larger than regular blockquotes with distinct styling.
 #+END_ASIDE
+
+** Aside vs Blockquote
+
+Regular blockquote for comparison:
+
+#+BEGIN_QUOTE
+This is a regular blockquote — smaller, with a left border. Best for quoting
+other sources or adding brief commentary.
+#+END_QUOTE
+
+| Type       | Use Case                     | Styling                |
+|------------+------------------------------+------------------------|
+| Blockquote | Quoting sources              | Border-left, italic    |
+| Aside      | Pull quotes, tangential info | Large text, emphasized |
+| Callout    | Tips, warnings, alerts       | Colored box + emoji    |
 
 #+BEGIN_TOGGLE :heading "Org Source"
 #+BEGIN_SRC org
 ,#+BEGIN_ASIDE
-Tangential content here. Supports *formatting* and [[https://ghost.org][links]].
+Asides are minimal containers. They use Ghost's =kg-blockquote-alt= class which
+renders larger than regular blockquotes with distinct styling.
 ,#+END_ASIDE
+
+,#+BEGIN_QUOTE
+This is a regular blockquote — smaller, with a left border. Best for quoting
+other sources or adding brief commentary.
+,#+END_QUOTE
 #+END_SRC
 #+END_TOGGLE
+
+#+BEGIN_CALLOUT :emoji "📋" :color grey
+*Properties:* None — asides are simple containers with no options.
+#+END_CALLOUT
 
 * Button Blocks
 
@@ -410,11 +487,23 @@ Right Aligned
 
 #+BEGIN_TOGGLE :heading "Org Source"
 #+BEGIN_SRC org
-,#+BEGIN_BUTTON :url "https://example.com" :alignment center
-Button Text
+,#+BEGIN_BUTTON :url "https://ghost.org" :alignment left
+Left Aligned
+,#+END_BUTTON
+
+,#+BEGIN_BUTTON :url "https://ghost.org" :alignment center
+Center Aligned
+,#+END_BUTTON
+
+,#+BEGIN_BUTTON :url "https://ghost.org" :alignment right
+Right Aligned
 ,#+END_BUTTON
 #+END_SRC
 #+END_TOGGLE
+
+#+BEGIN_CALLOUT :emoji "📋" :color grey
+*Properties:* =:url= (required), =:alignment= (left, center, right)
+#+END_CALLOUT
 
 * Header Cards
 
@@ -435,26 +524,32 @@ Large Header
 #+BEGIN_TOGGLE :heading "Org Source"
 #+BEGIN_SRC org
 ,#+BEGIN_HEADER :size small
-Header Text
+Small Header
+,#+END_HEADER
+
+,#+BEGIN_HEADER :size medium
+Medium Header
+,#+END_HEADER
+
+,#+BEGIN_HEADER :size large
+Large Header
 ,#+END_HEADER
 #+END_SRC
 #+END_TOGGLE
+
+#+BEGIN_CALLOUT :emoji "📋" :color grey
+*Properties:* =:size= (small, medium, large)
+#+END_CALLOUT
 
 * Signup Forms
 
 Capture email subscribers.
 
-Regular layout:
-
 #+BEGIN_SIGNUP :layout regular :buttonText "Subscribe"
 #+END_SIGNUP
 
-Wide layout:
-
 #+BEGIN_SIGNUP :layout wide :buttonText "Join Newsletter"
 #+END_SIGNUP
-
-Split layout:
 
 #+BEGIN_SIGNUP :layout split :buttonText "Get Updates"
 #+END_SIGNUP
@@ -463,8 +558,18 @@ Split layout:
 #+BEGIN_SRC org
 ,#+BEGIN_SIGNUP :layout regular :buttonText "Subscribe"
 ,#+END_SIGNUP
+
+,#+BEGIN_SIGNUP :layout wide :buttonText "Join Newsletter"
+,#+END_SIGNUP
+
+,#+BEGIN_SIGNUP :layout split :buttonText "Get Updates"
+,#+END_SIGNUP
 #+END_SRC
 #+END_TOGGLE
+
+#+BEGIN_CALLOUT :emoji "📋" :color grey
+*Properties:* =:layout= (regular, wide, split), =:buttonText= (button label)
+#+END_CALLOUT
 
 * Email-Only Content
 
@@ -483,60 +588,103 @@ It won't appear on the website version of this post.
 #+BEGIN_TOGGLE :heading "Org Source"
 #+BEGIN_SRC org
 ,#+BEGIN_EMAIL
-<p>Thanks for being a subscriber!</p>
-<p>This only appears in the <strong>email version</strong>.</p>
+<p>Thanks for being a subscriber! Here's exclusive content just for you.</p>
+<p>This paragraph only appears in the <strong>email version</strong> of this post.</p>
 ,#+END_EMAIL
 #+END_SRC
 #+END_TOGGLE
 
-#+BEGIN_CALLOUT :emoji "💡" :color blue
-Use EMAIL blocks for subscriber-exclusive content, special offers,
-or personalized messages that don't belong on the public web version.
+#+BEGIN_CALLOUT :emoji "📋" :color grey
+*Properties:* None — content is raw HTML. Use for subscriber-exclusive messages.
 #+END_CALLOUT
 
 * Call to Action (CTA)
 
-Prominent sections to drive reader action.
+Prominent sections to drive reader action. More customizable than simple buttons.
+
+** Layouts
 
 #+BEGIN_CTA :layout minimal :buttonText "Learn More" :url "https://ghost.org"
-Simple and clean. Great for subtle prompts.
+*Minimal* — Simple and clean. Great for subtle prompts.
 #+END_CTA
 
 #+BEGIN_CTA :layout immersive :buttonText "Get Started" :url "https://ghost.org"
-Bold and attention-grabbing. For important conversions.
+*Immersive* — Bold and attention-grabbing. For important conversions.
 #+END_CTA
 
 #+BEGIN_CTA :layout branded :buttonText "Join Us" :url "https://ghost.org"
-Branded styling. Shows site identity.
+*Branded* — Shows site identity with accent colors.
+#+END_CTA
+
+** Properties
+
+| Property           | Values                        | Description              |
+|--------------------+-------------------------------+--------------------------|
+| =:layout=          | minimal, immersive, branded   | Visual style             |
+| =:buttonText=      | any string                    | Button label             |
+| =:url=             | URL                           | Button link              |
+| =:backgroundColor= | grey, white, blue, etc.       | Background (9 colors)    |
+| =:buttonColor=     | hex (=#000000=)               | Button background        |
+| =:buttonTextColor= | hex (=#ffffff=)               | Button text color        |
+| =:alignment=       | left, center                  | Content alignment        |
+
+** Custom Styled CTA
+
+#+BEGIN_CTA :layout minimal :buttonText "Custom Colors" :url "https://ghost.org" :buttonColor "#8B5CF6" :buttonTextColor "#ffffff" :backgroundColor "grey"
+CTA with custom purple button and grey background.
 #+END_CTA
 
 #+BEGIN_TOGGLE :heading "Org Source"
 #+BEGIN_SRC org
-,#+BEGIN_CTA :layout minimal :buttonText "Learn More" :url "https://example.com"
-Compelling message here.
+,#+BEGIN_CTA :layout minimal :buttonText "Learn More" :url "https://ghost.org"
+*Minimal* — Simple and clean. Great for subtle prompts.
+,#+END_CTA
+
+,#+BEGIN_CTA :layout immersive :buttonText "Get Started" :url "https://ghost.org"
+*Immersive* — Bold and attention-grabbing. For important conversions.
+,#+END_CTA
+
+,#+BEGIN_CTA :layout branded :buttonText "Join Us" :url "https://ghost.org"
+*Branded* — Shows site identity with accent colors.
+,#+END_CTA
+
+,#+BEGIN_CTA :layout minimal :buttonText "Custom Colors" :url "https://ghost.org" :buttonColor "#8B5CF6" :buttonTextColor "#ffffff" :backgroundColor "grey"
+CTA with custom purple button and grey background.
 ,#+END_CTA
 #+END_SRC
 #+END_TOGGLE
+
+#+BEGIN_CALLOUT :emoji "📋" :color grey
+*Properties:* =:layout= (minimal, immersive, branded), =:url=, =:buttonText=, =:backgroundColor= (9 colors), =:buttonColor= (hex), =:buttonTextColor= (hex), =:alignment= (left, center)
+#+END_CALLOUT
 
 * Bookmark Cards
 
 Rich link previews with metadata.
 
-#+BEGIN_BOOKMARK :url "https://ghost.org" :title "Ghost: The Creator Economy Platform" :description "The world's most popular modern publishing platform for creating a new media platform." :thumbnail "https://ghost.org/images/meta/ghost.png" :icon "https://ghost.org/favicon.ico"
+#+BEGIN_BOOKMARK :url "https://ghost.org" :title "Ghost: The Creator Economy Platform" :description "The world's most popular modern publishing platform." :thumbnail "https://ghost.org/images/meta/ghost.png" :icon "https://ghost.org/favicon.ico"
 Ghost
 #+END_BOOKMARK
 
-#+BEGIN_BOOKMARK :url "https://github.com/TryGhost/Ghost" :title "TryGhost/Ghost" :description "Independent technology for modern publishing, memberships, subscriptions and newsletters." :icon "https://github.githubassets.com/favicons/favicon.svg"
+#+BEGIN_BOOKMARK :url "https://github.com/TryGhost/Ghost" :title "TryGhost/Ghost" :description "Independent technology for modern publishing." :icon "https://github.githubassets.com/favicons/favicon.svg"
 GitHub
 #+END_BOOKMARK
 
 #+BEGIN_TOGGLE :heading "Org Source"
 #+BEGIN_SRC org
-,#+BEGIN_BOOKMARK :url "URL" :title "Title" :description "Desc" :thumbnail "IMG" :icon "ICO"
-Fallback text
+,#+BEGIN_BOOKMARK :url "https://ghost.org" :title "Ghost: The Creator Economy Platform" :description "The world's most popular modern publishing platform." :thumbnail "https://ghost.org/images/meta/ghost.png" :icon "https://ghost.org/favicon.ico"
+Ghost
+,#+END_BOOKMARK
+
+,#+BEGIN_BOOKMARK :url "https://github.com/TryGhost/Ghost" :title "TryGhost/Ghost" :description "Independent technology for modern publishing." :icon "https://github.githubassets.com/favicons/favicon.svg"
+GitHub
 ,#+END_BOOKMARK
 #+END_SRC
 #+END_TOGGLE
+
+#+BEGIN_CALLOUT :emoji "📋" :color grey
+*Properties:* =:url= (required), =:title=, =:description=, =:thumbnail= (image URL), =:icon= (favicon URL)
+#+END_CALLOUT
 
 * Product Cards
 
@@ -552,11 +700,19 @@ Advanced Course (no button)
 
 #+BEGIN_TOGGLE :heading "Org Source"
 #+BEGIN_SRC org
-,#+BEGIN_PRODUCT :url "https://shop.example.com/item" :buttonText "Buy Now"
-Product Title
+,#+BEGIN_PRODUCT :url "https://example.com/widget" :buttonText "Buy Now - $49"
+Premium Widget Pro
+,#+END_PRODUCT
+
+,#+BEGIN_PRODUCT :url "https://example.com/course"
+Advanced Course (no button)
 ,#+END_PRODUCT
 #+END_SRC
 #+END_TOGGLE
+
+#+BEGIN_CALLOUT :emoji "📋" :color grey
+*Properties:* =:url= (product link), =:buttonText= (optional, omit for no button)
+#+END_CALLOUT
 
 * Images
 
@@ -686,7 +842,7 @@ Tables export as HTML blocks (Lexical lacks native table support).
 |-----------+--------+------------------|
 | Headings  | Done   | H2-H6 supported  |
 | Lists     | Done   | Nested too       |
-| Callouts  | Done   | 7 colors         |
+| Callouts  | Done   | 9 colors         |
 | Tables    | Done   | Via HTML export  |
 
 #+BEGIN_TOGGLE :heading "Org Source"
@@ -931,7 +1087,7 @@ and create your own posts using the same pipeline.
 | Structure | Blockquote, Horizontal Rule, Table (as HTML)          |
 | Lists     | Ordered, Unordered, Nested, Checkbox                  |
 | Code      | Code Block (syntax highlighted)                       |
-| Cards     | Callout (7 colors), Toggle, Aside, Button, Bookmark   |
+| Cards     | Callout (9 colors), Toggle, Aside, Button, Bookmark   |
 | Media     | Image (3 widths), Video, Audio, Gallery, File, Embed  |
 | Ghost     | Header (3 sizes), Signup (3 layouts), CTA (3 layouts) |
 | Product   | Product Card                                          |
