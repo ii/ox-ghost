@@ -17,7 +17,7 @@
 
 #+PROPERTY: header-args :eval never-export
 
-[[https://www.ii.coop/content/files/2026/01/ghost-nodes.org][ghost-nodes.org]] ==> [[https://github.com/ii/ox-ghost][ox-ghost]] ==> https://www.ii.coop/ghost-nodes/
+[[https://www.ii.coop/content/files/2026/01/ghost-nodes.org][ghost-nodes.org]] ==> [[https://github.com/ii/ox-ghost][ox-ghost]] ==> https://ghost-nodes.ii.coop
 
 * Introduction
 
