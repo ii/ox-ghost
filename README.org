@@ -13,7 +13,7 @@
 #+GHOST_UPDATED_AT: 2026-01-31T09:37:54.000Z
 #+GHOST_IMAGE: https://www.ii.coop/content/images/2026/01/ox-ghost.jpeg
 
-https://ox-ghost.ii.coop · [[https://www.ii.coop/content/files/2026/01/README.org][README.org]] · [[https://github.com/ii/ox-ghost][ox-ghost]]
+[[https://www.ii.coop/content/files/2026/01/README.org][README.org]] ==> [[https://github.com/ii/ox-ghost][ox-ghost]] ==> https://ox-ghost.ii.coop
 
 * Overview
 
