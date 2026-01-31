@@ -5,6 +5,12 @@
 #+GHOST_STATUS: draft
 #+GHOST_TAGS: emacs, org-mode, ghost, tools, open-source
 #+GHOST_EXCERPT: Export org-mode documents directly to Ghost CMS with full support for all Koenig editor card types.
+#+GHOST_ID: 697dcd073c8ddf0001728fa8
+#+GHOST_UUID: 90fe6afd-1fb6-426f-8dbc-6cacaa3c8d33
+#+GHOST_URL: https://www.ii.coop/p/90fe6afd-1fb6-426f-8dbc-6cacaa3c8d33/
+#+GHOST_VISIBILITY: public
+#+GHOST_CREATED_AT: 2026-01-31T09:36:07.000Z
+#+GHOST_UPDATED_AT: 2026-01-31T09:36:07.000Z
 
 * Overview
 
