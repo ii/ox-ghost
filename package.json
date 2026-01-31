@@ -5,11 +5,16 @@
   "main": "ox-ghost-render.js",
   "bin": {
     "ox-ghost-render": "./ox-ghost-render.js",
-    "ox-ghost": "./ox-ghost.js"
+    "ghost": "./ghost.js"
   },
   "scripts": {
     "validate": "node ox-ghost-render.js",
-    "test": "node ox-ghost-render.js demo/test-minimal.org --html demo/test-minimal.html"
+    "test": "mocha 'test/**/*.test.js' --timeout 30000",
+    "test:minimal": "mocha 'test/all-nodes.test.js' --timeout 30000",
+    "test:style": "mocha 'test/style-test.test.js' --timeout 30000",
+    "test:watch": "mocha 'test/**/*.test.js' --timeout 30000 --watch",
+    "test:coverage": "c8 mocha 'test/**/*.test.js' --timeout 30000",
+    "demo": "node ox-ghost-render.js demo/test-minimal.org --html demo/test-minimal.html"
   },
   "keywords": [
     "org-mode",
@@ -34,5 +39,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/ii/ox-ghost"
+  },
+  "devDependencies": {
+    "mocha": "^10.2.0",
+    "chai": "^4.3.7",
+    "c8": "^8.0.0"
   }
 }

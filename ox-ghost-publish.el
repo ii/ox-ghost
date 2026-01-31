@@ -18,6 +18,7 @@
 (require 'org)
 (require 'json)
 (require 'url)
+(require 'cl-lib)
 
 ;;;; Configuration
 
@@ -34,8 +35,8 @@ Must be set before publishing."
   :group 'ghost-publish)
 
 (defcustom ghost-publish-script nil
-  "Path to ox-ghost.js CLI script.
-If nil, looks for ox-ghost.js in the ox-ghost directory."
+  "Path to ghost.js CLI script.
+If nil, looks for ghost.js in the ox-ghost directory."
   :type '(choice (const :tag "Auto-detect" nil)
                  (file :tag "Custom path"))
   :group 'ghost-publish)
@@ -52,15 +53,15 @@ If nil, looks for ox-ghost.js in the ox-ghost directory."
 ;;;; Utility Functions
 
 (defun ghost-publish--find-script ()
-  "Find ox-ghost.js script path.
+  "Find ghost.js script path.
 Checks `ghost-publish-script', then the package directory."
   (or ghost-publish-script
-      (let ((local (expand-file-name "ox-ghost.js" ghost-publish--directory)))
+      (let ((local (expand-file-name "ghost.js" ghost-publish--directory)))
         (when (file-exists-p local) local))
-      (error "ox-ghost.js not found. Set `ghost-publish-script'")))
+      (error "ghost.js not found. Set `ghost-publish-script'")))
 
 (defun ghost-publish--script-dir ()
-  "Get directory containing ox-ghost.js."
+  "Get directory containing ghost.js."
   (file-name-directory (ghost-publish--find-script)))
 
 (defun ghost-publish--temp-dir ()
@@ -75,7 +76,7 @@ Checks `ghost-publish-script', then the package directory."
 (defun ghost-publish--upload-file (file)
   "Upload FILE to Ghost, return URL."
   (let ((output (ghost-publish--run-command
-                 (format "cd %s && node ox-ghost.js upload %s 2>&1 | grep -o 'https://[^ ]*'"
+                 (format "cd %s && node ghost.js upload %s 2>&1 | grep -o 'https://[^ ]*'"
                          (ghost-publish--script-dir)
                          (shell-quote-argument file)))))
     (if (string-prefix-p "https://" output)
@@ -451,7 +452,8 @@ Point should be on the line to modify."
 
 (defun ghost-publish (&optional title)
   "Publish current buffer to Ghost as a new draft post.
-TITLE defaults to #+TITLE value."
+TITLE defaults to #+TITLE value.
+After successful publish, syncs Ghost metadata back to org headers."
   (interactive)
   (let* ((org-file (buffer-file-name))
          (title (or title
@@ -460,40 +462,89 @@ TITLE defaults to #+TITLE value."
                       (when (re-search-forward "^#\\+TITLE:\\s-*\\(.+\\)$" nil t)
                         (match-string 1)))
                     (file-name-base org-file)))
-         (json-file (concat (file-name-sans-extension org-file) ".json")))
+         (json-file (concat (file-name-sans-extension org-file) ".json"))
+         (metadata-file (concat (file-name-sans-extension org-file) ".metadata.json")))
     ;; Export to Lexical JSON
     (require 'ox-ghost)
     (org-lexical-export-to-file)
-    ;; Publish via ghost.js
-    (let ((output (ghost-publish--run-command
-                   (format "cd %s && node ox-ghost.js post create %s %s 2>&1"
-                           (ghost-publish--script-dir)
-                           (shell-quote-argument title)
-                           (shell-quote-argument json-file)))))
+    ;; Publish via ghost.js and capture full JSON response
+    (let* ((temp-response (make-temp-file "ghost-response-" nil ".json"))
+           (cmd (format "cd %s && node ghost.js post get-create-response %s %s > %s 2>&1"
+                        (ghost-publish--script-dir)
+                        (shell-quote-argument title)
+                        (shell-quote-argument json-file)
+                        (shell-quote-argument temp-response)))
+           ;; Fall back to simple create if get-create-response doesn't exist
+           (output (ghost-publish--run-command
+                    (format "cd %s && node ghost.js post create %s %s 2>&1"
+                            (ghost-publish--script-dir)
+                            (shell-quote-argument title)
+                            (shell-quote-argument json-file)))))
       (if (string-match "https://[^ \n]+" output)
           (let ((url (match-string 0 output)))
-            (message "Published: %s" url)
+            ;; Try to pull metadata from Ghost for the newly created post
+            ;; Extract slug from URL: https://www.ii.coop/slug-here/
+            (when (string-match "https://[^/]+/\\([^/]+\\)/?$" url)
+              (let ((slug (match-string 1 url)))
+                (condition-case err
+                    (progn
+                      ;; Fetch full post data and write to metadata file
+                      (let ((post-json (ghost-publish--run-command
+                                        (format "cd %s && node ghost.js post get %s 2>&1"
+                                                (ghost-publish--script-dir)
+                                                (shell-quote-argument slug)))))
+                        (with-temp-file metadata-file
+                          (insert post-json))
+                        ;; Sync metadata to org headers
+                        (ox-ghost-sync-metadata-to-org metadata-file)
+                        (save-buffer)
+                        (message "Published and synced: %s" url)))
+                  (error
+                   (message "Published: %s (metadata sync failed: %s)" url (error-message-string err))))))
             (kill-new url)
             url)
         (error "Publish failed: %s" output)))))
 
-(defun ghost-update (slug-or-id)
-  "Update existing Ghost post identified by SLUG-OR-ID."
-  (interactive "sPost slug or ID: ")
+(defun ghost-update (&optional slug-or-id)
+  "Update existing Ghost post.
+If SLUG-OR-ID is nil, auto-detects from #+GHOST_ID: or #+GHOST_SLUG: in buffer.
+After successful update, syncs Ghost metadata back to org headers."
+  (interactive)
   (let* ((org-file (buffer-file-name))
-         (json-file (concat (file-name-sans-extension org-file) ".json")))
+         (json-file (concat (file-name-sans-extension org-file) ".json"))
+         (metadata-file (concat (file-name-sans-extension org-file) ".metadata.json"))
+         ;; Auto-detect identifier from org headers if not provided
+         (identifier (or slug-or-id
+                         (ox-ghost--get-header "GHOST_ID")
+                         (ox-ghost--get-header "GHOST_SLUG")
+                         (read-string "Post slug or ID: "))))
+    (when (string-empty-p identifier)
+      (user-error "No post identifier. Publish first or provide slug/ID"))
     ;; Export to Lexical JSON
     (require 'ox-ghost)
     (org-lexical-export-to-file)
     ;; Update via ghost.js
     (let ((output (ghost-publish--run-command
-                   (format "cd %s && node ox-ghost.js post update %s %s 2>&1"
+                   (format "cd %s && node ghost.js post update %s %s 2>&1"
                            (ghost-publish--script-dir)
-                           (shell-quote-argument slug-or-id)
+                           (shell-quote-argument identifier)
                            (shell-quote-argument json-file)))))
       (if (string-match "https://[^ \n]+" output)
           (let ((url (match-string 0 output)))
-            (message "Updated: %s" url)
+            ;; Fetch updated metadata and sync back
+            (condition-case err
+                (progn
+                  (let ((post-json (ghost-publish--run-command
+                                    (format "cd %s && node ghost.js post get %s 2>&1"
+                                            (ghost-publish--script-dir)
+                                            (shell-quote-argument identifier)))))
+                    (with-temp-file metadata-file
+                      (insert post-json))
+                    (ox-ghost-sync-metadata-to-org metadata-file)
+                    (save-buffer)
+                    (message "Updated and synced: %s" url)))
+              (error
+               (message "Updated: %s (metadata sync failed: %s)" url (error-message-string err))))
             (kill-new url)
             url)
         (error "Update failed: %s" output)))))
@@ -567,6 +618,200 @@ TITLE defaults to #+TITLE value."
   (ghost-enrich-buffer)
   (save-buffer)
   (message "Done - ready to export with M-x ghost-preview or M-x ghost-publish"))
+
+;;;; Phase 5: Metadata Sync Functions
+
+(defun ox-ghost--get-header (key)
+  "Get value of #+KEY: header from current buffer.
+Returns nil if not found."
+  (save-excursion
+    (goto-char (point-min))
+    (let ((header-re (format "^#\\+%s:\\s-*\\(.*\\)$" (regexp-quote key))))
+      (when (re-search-forward header-re nil t)
+        (let ((val (string-trim (match-string 1))))
+          (unless (string-empty-p val) val))))))
+
+(defun ox-ghost--update-header (key value)
+  "Update or insert #+KEY: VALUE in current buffer's header section.
+If VALUE is nil or empty, removes the header line."
+  (save-excursion
+    (goto-char (point-min))
+    (let ((header-re (format "^#\\+%s:.*$" (regexp-quote key))))
+      (if (re-search-forward header-re nil t)
+          ;; Found existing header - update or remove
+          (if (and value (not (string-empty-p (if (stringp value) value (format "%s" value)))))
+              (replace-match (format "#+%s: %s" key value))
+            ;; Remove the line including newline
+            (beginning-of-line)
+            (delete-region (point) (min (1+ (line-end-position)) (point-max))))
+        ;; Not found - insert if value is non-nil
+        (when (and value (not (string-empty-p (if (stringp value) value (format "%s" value)))))
+          (ox-ghost--insert-header key value))))))
+
+(defun ox-ghost--insert-header (key value)
+  "Insert #+KEY: VALUE in appropriate location in header.
+Inserts after last #+GHOST_* line, or after #+TITLE if no ghost headers exist."
+  (save-excursion
+    (goto-char (point-min))
+    ;; Find last #+GHOST_* header
+    (let ((last-ghost-pos nil)
+          (title-pos nil))
+      ;; Search for all GHOST_ headers
+      (while (re-search-forward "^#\\+GHOST_[A-Z_]+:.*$" nil t)
+        (setq last-ghost-pos (point)))
+      ;; If no ghost headers, find #+TITLE
+      (unless last-ghost-pos
+        (goto-char (point-min))
+        (when (re-search-forward "^#\\+TITLE:.*$" nil t)
+          (setq title-pos (point))))
+      ;; Insert at appropriate position
+      (cond
+       (last-ghost-pos
+        (goto-char last-ghost-pos)
+        (end-of-line)
+        (insert (format "\n#+%s: %s" key value)))
+       (title-pos
+        (goto-char title-pos)
+        (end-of-line)
+        (insert (format "\n#+%s: %s" key value)))
+       (t
+        ;; No headers found, insert at beginning
+        (goto-char (point-min))
+        (insert (format "#+%s: %s\n" key value)))))))
+
+(defun ox-ghost-sync-metadata-to-org (metadata-file &optional org-buffer)
+  "Read METADATA-FILE (.metadata.json) and update org buffer headers.
+If ORG-BUFFER is nil, updates current buffer.
+Returns t on success, nil on failure."
+  (interactive
+   (list (read-file-name "Metadata file: " nil nil t
+                         (concat (file-name-sans-extension (buffer-file-name)) ".metadata.json"))))
+  (unless (file-exists-p metadata-file)
+    (message "Metadata file not found: %s" metadata-file)
+    (cl-return-from ox-ghost-sync-metadata-to-org nil))
+  (let* ((json-object-type 'alist)
+         (json-array-type 'list)
+         (json-key-type 'symbol)
+         (metadata (condition-case err
+                       (json-read-file metadata-file)
+                     (error
+                      (message "Failed to parse metadata file: %s" (error-message-string err))
+                      nil)))
+         ;; Map JSON keys to org header names
+         (mappings '((id . "GHOST_ID")
+                     (uuid . "GHOST_UUID")
+                     (slug . "GHOST_SLUG")
+                     (url . "GHOST_URL")
+                     (status . "GHOST_STATUS")
+                     (visibility . "GHOST_VISIBILITY")
+                     (created_at . "GHOST_CREATED_AT")
+                     (updated_at . "GHOST_UPDATED_AT")
+                     (published_at . "GHOST_PUBLISHED_AT")
+                     (feature_image . "GHOST_IMAGE")
+                     (custom_excerpt . "GHOST_EXCERPT"))))
+    (when metadata
+      (with-current-buffer (or org-buffer (current-buffer))
+        (dolist (mapping mappings)
+          (let* ((json-key (car mapping))
+                 (header-name (cdr mapping))
+                 (value (alist-get json-key metadata)))
+            ;; Handle different value types
+            (when value
+              (let ((str-value (cond
+                                ((stringp value) value)
+                                ((numberp value) (number-to-string value))
+                                ((eq value t) "true")
+                                ((eq value :json-false) "false")
+                                (t (format "%s" value)))))
+                (ox-ghost--update-header header-name str-value)))))
+        (message "Synced metadata from %s" (file-name-nondirectory metadata-file))
+        t))))
+
+(defun ghost-pull-metadata ()
+  "Fetch current post metadata from Ghost and update org headers.
+Uses GHOST_ID or GHOST_SLUG from current buffer to identify the post."
+  (interactive)
+  (let ((id (ox-ghost--get-header "GHOST_ID"))
+        (slug (ox-ghost--get-header "GHOST_SLUG")))
+    (unless (or id slug)
+      (user-error "No GHOST_ID or GHOST_SLUG found in buffer. Publish first"))
+    (let* ((identifier (or id slug))
+           (script-dir (ghost-publish--script-dir))
+           (temp-file (make-temp-file "ghost-metadata-" nil ".json"))
+           (cmd (format "cd %s && node ghost.js post get %s 2>&1"
+                        script-dir
+                        (shell-quote-argument identifier)))
+           (output (ghost-publish--run-command cmd)))
+      ;; Write output to temp file (it should be JSON)
+      (condition-case err
+          (progn
+            ;; Parse and re-encode to validate JSON
+            (let* ((json-object-type 'alist)
+                   (json-array-type 'list)
+                   (json-key-type 'symbol)
+                   (parsed (json-read-from-string output)))
+              ;; Write to temp file
+              (with-temp-file temp-file
+                (insert (json-encode parsed)))
+              ;; Sync to org
+              (ox-ghost-sync-metadata-to-org temp-file)
+              (save-buffer)
+              (delete-file temp-file)
+              (message "Pulled metadata for %s" identifier)))
+        (error
+         (when (file-exists-p temp-file)
+           (delete-file temp-file))
+         (user-error "Failed to fetch metadata: %s" (error-message-string err)))))))
+
+(defun ghost-status ()
+  "Show sync status comparing local org headers to Ghost.
+Displays diff of local metadata vs Ghost's current state."
+  (interactive)
+  (let ((id (ox-ghost--get-header "GHOST_ID"))
+        (slug (ox-ghost--get-header "GHOST_SLUG")))
+    (unless (or id slug)
+      (user-error "No GHOST_ID or GHOST_SLUG found. Publish first"))
+    (let* ((identifier (or id slug))
+           (script-dir (ghost-publish--script-dir))
+           (cmd (format "cd %s && node ghost.js post get %s 2>&1"
+                        script-dir
+                        (shell-quote-argument identifier)))
+           (output (ghost-publish--run-command cmd))
+           (local-headers '(("GHOST_ID" . id)
+                            ("GHOST_SLUG" . slug)
+                            ("GHOST_STATUS" . status)
+                            ("GHOST_URL" . url)
+                            ("GHOST_UPDATED_AT" . updated_at)
+                            ("GHOST_PUBLISHED_AT" . published_at))))
+      (condition-case err
+          (let* ((json-object-type 'alist)
+                 (json-array-type 'list)
+                 (json-key-type 'symbol)
+                 (ghost-data (json-read-from-string output)))
+            (with-current-buffer (get-buffer-create "*Ghost Sync Status*")
+              (erase-buffer)
+              (insert "Ghost Sync Status\n")
+              (insert "=================\n\n")
+              (insert (format "Post: %s\n\n" (or (alist-get 'title ghost-data) identifier)))
+              (insert (format "%-20s %-30s %-30s\n" "Field" "Local (org)" "Remote (Ghost)"))
+              (insert (make-string 80 ?-) "\n")
+              (dolist (pair local-headers)
+                (let* ((header (car pair))
+                       (json-key (cdr pair))
+                       (local-val (ox-ghost--get-header header))
+                       (remote-val (alist-get json-key ghost-data))
+                       (remote-str (if remote-val (format "%s" remote-val) "(none)"))
+                       (local-str (or local-val "(none)"))
+                       (diff-marker (if (equal local-str remote-str) " " "*")))
+                  (insert (format "%s %-19s %-30s %-30s\n"
+                                  diff-marker header
+                                  (truncate-string-to-width local-str 29)
+                                  (truncate-string-to-width remote-str 29)))))
+              (insert "\n* = differs from Ghost\n")
+              (goto-char (point-min))
+              (display-buffer (current-buffer))))
+        (error
+         (user-error "Failed to fetch status: %s" (error-message-string err)))))))
 
 (provide 'ox-ghost-publish)
 ;;; ox-ghost-publish.el ends here

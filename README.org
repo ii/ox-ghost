@@ -1,6 +1,10 @@
 #+TITLE: ox-ghost: Org-mode to Ghost Lexical JSON Exporter
 #+AUTHOR: ii.coop
 #+DATE: 2026-01-28
+#+GHOST_SLUG: ox-ghost
+#+GHOST_STATUS: draft
+#+GHOST_TAGS: emacs, org-mode, ghost, tools, open-source
+#+GHOST_EXCERPT: Export org-mode documents directly to Ghost CMS with full support for all Koenig editor card types.
 
 * Overview
 
@@ -9,12 +13,39 @@ Ghost's Lexical JSON format, enabling direct publishing to Ghost CMS.
 
 * Installation
 
-** Emacs
-
-Load the elisp file in Emacs:
+** Doom Emacs (packages.el)
 
 #+BEGIN_SRC elisp
-(load "/path/to/ox-ghost/ox-ghost.el")
+(package! ox-ghost
+  :recipe (:host github :repo "ii/ox-ghost"
+           :files ("ox-ghost.el" "ox-ghost-publish.el")))
+#+END_SRC
+
+Then in =config.el=:
+
+#+BEGIN_SRC elisp
+(use-package! ox-ghost
+  :after org
+  :config
+  ;; Optional: Set path to ghost.js for publishing
+  (setq ghost-publish-script "/path/to/ox-ghost/ghost.js"))
+#+END_SRC
+
+** Straight.el / use-package
+
+#+BEGIN_SRC elisp
+(use-package ox-ghost
+  :straight (:host github :repo "ii/ox-ghost"
+             :files ("ox-ghost.el" "ox-ghost-publish.el"))
+  :after org)
+#+END_SRC
+
+** Manual Installation
+
+#+BEGIN_SRC elisp
+(add-to-list 'load-path "/path/to/ox-ghost")
+(require 'ox-ghost)
+(require 'ox-ghost-publish) ; Optional: for publishing workflow
 #+END_SRC
 
 ** Node.js Validator (optional)
@@ -416,6 +447,18 @@ Ghost Koenig editor supports these node types (from [[https://github.com/TryGhos
 
 * Version History
 
+** 0.8.0 (2026-01-31)
+- Added round-trip metadata sync (=ghost-publish= writes =#+GHOST_ID:= etc back to org)
+- Added =ghost-pull-metadata= to refresh org headers from Ghost
+- Added =ghost-status= to show sync diff
+- =ghost-update= now auto-detects post from =#+GHOST_ID:= header
+- Fixed link display text showing =//= instead of full URL
+
+** 0.7.0 (2026-01-30)
+- Added =ox-ghost-publish.el= for complete publishing workflow
+- Added media generation functions (TTS, images, video)
+- Added media enrichment (auto-fetch dimensions, duration)
+
 ** 0.6.0 (2026-01-29)
 - Added bundled Ghost renderer for local validation
 - Added =validate-lexical.js= tool
@@ -440,12 +483,12 @@ Ghost Koenig editor supports these node types (from [[https://github.com/TryGhos
 
 * Ghost Publishing Workflow
 
-For a complete publishing workflow with media generation and enrichment, see =ghost-publish.el=.
+For a complete publishing workflow with media generation and enrichment, see =ox-ghost-publish.el=.
 
 ** Quick Start
 
 #+BEGIN_SRC elisp
-(require 'ghost-publish)
+(require 'ox-ghost-publish)
 #+END_SRC
 
 ** Phases
@@ -457,7 +500,30 @@ For a complete publishing workflow with media generation and enrichment, see =gh
 | Preview  | =M-x ghost-preview=       | View HTML locally              |
 | Publish  | =M-x ghost-publish=       | Send to Ghost as draft         |
 
-See [[file:ghost-publish.org][ghost-publish.org]] for complete documentation.
+** Round-Trip Metadata Sync
+
+After publishing, =ox-ghost= automatically syncs Ghost metadata back to your org file:
+
+#+BEGIN_SRC org
+,#+GHOST_ID: 697dc6b53c8ddf0001728f9f
+,#+GHOST_UUID: e34c9f93-6f87-4cad-ae5c-c4e338d1df14
+,#+GHOST_SLUG: my-post-slug
+,#+GHOST_URL: https://www.ii.coop/my-post-slug/
+,#+GHOST_STATUS: draft
+,#+GHOST_CREATED_AT: 2026-01-31T09:09:09.000Z
+,#+GHOST_UPDATED_AT: 2026-01-31T09:09:09.000Z
+#+END_SRC
+
+This enables a true round-trip workflow:
+
+| Command                | Behavior                                      |
+|------------------------+-----------------------------------------------|
+| =M-x ghost-publish=    | Create post, sync id/uuid/url back to org     |
+| =M-x ghost-update=     | Auto-detects post from =#+GHOST_ID:=, updates |
+| =M-x ghost-pull-metadata= | Refresh org headers from Ghost             |
+| =M-x ghost-status=     | Show diff between local org and Ghost         |
+
+The org file becomes your source of truth while staying in sync with Ghost.
 
 * Resources
 

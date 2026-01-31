@@ -6,6 +6,10 @@ node_modules/
 !package.json
 !package-lock.json
 !demo/*.json
+!test/*.json
+
+# Metadata files from publishing
+*.metadata.json
 
 # Demo media (ignore while iterating, commit example-* files)
 demo/*.mp3
@@ -29,3 +33,4 @@ demo/*.jpg
 # Local development
 .env
 tmp/
+CLAUDE.md
