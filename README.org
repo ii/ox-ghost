@@ -17,6 +17,8 @@
 
 * Overview
 
+*The org file becomes your source of truth while staying in sync with Ghost.*
+
 =ox-ghost= is an Emacs org-mode export backend that converts org files to
 Ghost's Lexical JSON format, enabling direct publishing to Ghost CMS.
 
@@ -509,3 +511,7 @@ The org file becomes your source of truth while staying in sync with Ghost.
 - [[https://ghost.org/docs/editor/][Ghost Editor Documentation]]
 - [[https://github.com/TryGhost/Koenig][Ghost Koenig Editor Source]]
 - [[https://lexical.dev/][Lexical Framework]]
+
+-----
+
+*The org file becomes your source of truth while staying in sync with Ghost.*
