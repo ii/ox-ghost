@@ -464,10 +464,10 @@ After successful publish, syncs Ghost metadata back to org headers."
                     (file-name-base org-file)))
          (json-file (concat (file-name-sans-extension org-file) ".json"))
          (metadata-file (concat (file-name-sans-extension org-file) ".metadata.json")))
-    ;; Export to Lexical JSON
+    ;; Export to Lexical JSON AND metadata
     (require 'ox-ghost)
-    (org-lexical-export-to-file)
-    ;; Publish via ghost.js and capture full JSON response
+    (org-lexical-export-for-ghost)
+    ;; Publish via ghost.js with --with-metadata to apply excerpt, tags, etc.
     (let* ((temp-response (make-temp-file "ghost-response-" nil ".json"))
            (cmd (format "cd %s && node ghost.js post get-create-response %s %s > %s 2>&1"
                         (ghost-publish--script-dir)
@@ -476,7 +476,7 @@ After successful publish, syncs Ghost metadata back to org headers."
                         (shell-quote-argument temp-response)))
            ;; Fall back to simple create if get-create-response doesn't exist
            (output (ghost-publish--run-command
-                    (format "cd %s && node ghost.js post create %s %s 2>&1"
+                    (format "cd %s && node ghost.js post create %s %s --with-metadata 2>&1"
                             (ghost-publish--script-dir)
                             (shell-quote-argument title)
                             (shell-quote-argument json-file)))))
@@ -520,12 +520,12 @@ After successful update, syncs Ghost metadata back to org headers."
                          (read-string "Post slug or ID: "))))
     (when (string-empty-p identifier)
       (user-error "No post identifier. Publish first or provide slug/ID"))
-    ;; Export to Lexical JSON
+    ;; Export to Lexical JSON AND metadata
     (require 'ox-ghost)
-    (org-lexical-export-to-file)
-    ;; Update via ghost.js
+    (org-lexical-export-for-ghost)
+    ;; Update via ghost.js with --with-metadata to apply excerpt, tags, etc.
     (let ((output (ghost-publish--run-command
-                   (format "cd %s && node ghost.js post update %s %s 2>&1"
+                   (format "cd %s && node ghost.js post update %s %s --with-metadata 2>&1"
                            (ghost-publish--script-dir)
                            (shell-quote-argument identifier)
                            (shell-quote-argument json-file)))))
