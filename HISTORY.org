@@ -1,0 +1,35 @@
+#+TITLE: ox-ghost Version History
+
+* 0.8.0 (2026-01-31)
+- Added round-trip metadata sync (=ghost-publish= writes =#+GHOST_ID:= etc back to org)
+- Added =ghost-pull-metadata= to refresh org headers from Ghost
+- Added =ghost-status= to show sync diff
+- =ghost-update= now auto-detects post from =#+GHOST_ID:= header
+- Fixed link display text showing =//= instead of full URL
+
+* 0.7.0 (2026-01-30)
+- Added =ox-ghost-publish.el= for complete publishing workflow
+- Added media generation functions (TTS, images, video)
+- Added media enrichment (auto-fetch dimensions, duration)
+
+* 0.6.0 (2026-01-29)
+- Added bundled Ghost renderer for local validation
+- Added =validate-lexical.js= tool
+- Added =STYLE-GUIDE.org= authoring guide
+- Renamed module to =ox-ghost=
+
+* 0.5.0 (2026-01-29)
+- Added REPL block for code + output with 5 styles (simple, labeled, callout, toggle, aside)
+- Added fixed-width element support (: prefix results)
+- Fixed post-blank spacing between formatted elements
+- Fixed nil return values causing "wrong-type-argument stringp" errors
+
+* 0.4.0 (2026-01-28)
+- Added support for all Ghost card types
+- Fixed JSON null/false encoding
+- Improved parameter parsing for URLs and multi-word values
+- Matched Ghost node property names exactly
+
+* 0.3.0 (2026-01-28)
+- Marker-based JSON assembly approach
+- Basic node support
