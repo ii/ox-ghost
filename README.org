@@ -12,8 +12,7 @@
 #+GHOST_CREATED_AT: 2026-01-31T09:36:07.000Z
 #+GHOST_UPDATED_AT: 2026-01-31T09:37:54.000Z
 
-- *Source*: https://github.com/ii/ox-ghost
-- *Download*: [[https://www.ii.coop/content/files/2026/01/README.org][README.org]]
+https://ox-ghost.ii.coop · [[https://www.ii.coop/content/files/2026/01/README.org][README.org]] · [[https://github.com/ii/ox-ghost][ox-ghost]]
 
 * Overview
 
