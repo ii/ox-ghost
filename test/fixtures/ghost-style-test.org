@@ -1,0 +1,561 @@
+#+TITLE: Ghost Style Test - Complete Node Coverage
+#+AUTHOR: ox-ghost Test Suite
+#+DESCRIPTION: Comprehensive test of all Ghost Lexical node types with all properties
+#+TAGS: test deleteme
+
+This document tests every Ghost node type with all available properties, based on Ghost's official kg-default-nodes test suite.
+
+* Text Formatting
+
+Testing all inline text formats supported by Ghost's Lexical editor.
+
+** Basic Formats
+
+This paragraph has *bold text* in it.
+
+This paragraph has /italic text/ in it.
+
+This paragraph has _underlined text_ in it.
+
+This paragraph has +strikethrough text+ in it.
+
+This paragraph has ~inline code~ in it.
+
+This paragraph has =verbatim text= in it.
+
+** Scientific Notation
+
+Water molecule: H_{2}O (subscript)
+
+Einstein's equation: E=mc^{2} (superscript)
+
+** Combined Formats
+
+Combined */bold italic/* text here.
+
+Triple */_bold italic underline_/* formatting.
+
+Nested ~code with *bold* inside~ test.
+
+** Special Inline
+
+This has @@ghost:highlight:highlighted text@@ here.
+
+* Headings
+
+Testing all six heading levels.
+
+** Second Level Heading
+
+*** Third Level Heading
+
+**** Fourth Level Heading
+
+***** Fifth Level Heading
+
+****** Sixth Level Heading (Maximum Depth)
+
+* Paragraphs
+
+First paragraph with some introductory text.
+
+Second paragraph after a blank line separator.
+
+Third paragraph with *bold*, /italic/, and ~code~ formatting mixed throughout the text to test inline formatting within paragraphs.
+
+A longer paragraph to test text wrapping and line handling. This paragraph contains enough text to demonstrate how Ghost handles longer content blocks. The Lexical editor processes this as a single paragraph node with the full text content preserved.
+
+* Lists
+
+** Unordered Lists
+
+- First bullet item
+- Second bullet item
+- Third bullet item with *bold* text
+
+** Ordered Lists
+
+1) First numbered item
+2) Second numbered item
+3) Third numbered item with /italic/ text
+
+** Nested Lists
+
+- Parent item one
+  - Nested child one
+  - Nested child two
+    - Deeply nested item
+    - Another deep item
+- Parent item two
+  - Single nested child
+
+** Checkbox Lists
+
+- [X] Completed task item
+- [ ] Pending task item
+- [-] Partially complete item
+
+* Blockquotes
+
+#+BEGIN_QUOTE
+The best way to predict the future is to invent it.
+— Alan Kay
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+Any sufficiently advanced technology is indistinguishable from magic.
+— Arthur C. Clarke, /Profiles of the Future/
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+*Innovation* distinguishes between a /leader/ and a follower.
+— Steve Jobs
+#+END_QUOTE
+
+* Code Blocks
+
+** JavaScript
+
+#+BEGIN_SRC javascript
+console.log("Hello, world!");
+
+function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+const result = fibonacci(10);
+console.log(`Fibonacci(10) = ${result}`);
+#+END_SRC
+
+** Python
+
+#+BEGIN_SRC python
+def hello():
+    """A simple greeting function."""
+    print("Hello from Python")
+
+class Calculator:
+    def add(self, a, b):
+        return a + b
+
+calc = Calculator()
+print(calc.add(2, 3))
+#+END_SRC
+
+** Go
+
+#+BEGIN_SRC go
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, Go!")
+
+    for i := 0; i < 5; i++ {
+        fmt.Printf("Count: %d\n", i)
+    }
+}
+#+END_SRC
+
+** Shell
+
+#+BEGIN_SRC bash
+#!/bin/bash
+echo "Shell script example"
+for file in *.txt; do
+    echo "Processing: $file"
+done
+#+END_SRC
+
+** No Language Specified
+
+#+BEGIN_SRC
+Code block without language specification.
+This tests the fallback rendering.
+#+END_SRC
+
+** Example Block
+
+#+BEGIN_EXAMPLE
+Example block content here.
+Preserves formatting exactly.
+Line three of example.
+#+END_EXAMPLE
+
+** Fixed Width
+
+: Fixed width line one
+: Fixed width line two
+: Fixed width line three
+
+* Links
+
+Check out [[https://ghost.org][Ghost CMS]] for modern publishing.
+
+Simple URL: [[https://github.com/ii/ox-ghost]]
+
+Multiple links: Visit [[https://ghost.org][Ghost]] and [[https://github.com][GitHub]] today.
+
+Email link: [[mailto:hello@example.com][Contact Us]]
+
+* Images
+
+** Basic Image
+
+#+ATTR_LEXICAL: :alt "Mountain landscape at sunrise"
+[[https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200]]
+
+** Image with Caption and Title
+
+#+ATTR_LEXICAL: :caption "Photo by Samuel Ferrara on Unsplash" :title "Click for details" :alt "Ethereal mountain peaks"
+[[https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=1200]]
+
+** Wide Image
+
+#+ATTR_LEXICAL: :cardWidth wide :caption "Panoramic mountain view" :alt "Wide mountain panorama"
+[[https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600]]
+
+** Full Width Image
+
+#+ATTR_LEXICAL: :cardWidth full :caption "Full bleed image" :alt "Dramatic mountain scene"
+[[https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2000]]
+
+** Clickable Image with Link
+
+#+ATTR_LEXICAL: :href "https://unsplash.com" :caption "Click to visit Unsplash" :alt "Starry night over mountains"
+[[https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=1200]]
+
+* Callout Cards
+
+All five callout colors with rich content.
+
+#+BEGIN_CALLOUT :emoji 💡 :color blue
+*Pro tip:* Use callouts to highlight important information. They support *bold*, /italic/, ~code~, and [[https://ghost.org][links]].
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji ⚠️ :color yellow
+*Warning:* This is a cautionary message. Pay attention to important details here.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji ❌ :color red
+*Error:* Something went wrong. Check your configuration and try again.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji ✅ :color green
+*Success:* Operation completed successfully. All tests passed!
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji 📝 :color grey
+*Note:* Additional context or background information goes here.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :color blue
+Callout without emoji - tests the no-emoji variant.
+#+END_CALLOUT
+
+* Toggle Cards
+
+Collapsible sections with rich content.
+
+#+BEGIN_TOGGLE :heading "What is Ghost?"
+Ghost is a powerful app for professional publishers to create, share, and grow a business around their content.
+
+Features include:
+- Modern editor with cards
+- Native newsletter support
+- Membership & subscriptions
+- SEO optimization built-in
+#+END_TOGGLE
+
+#+BEGIN_TOGGLE :heading "Installation Guide"
+To install ox-ghost:
+
+1. Clone the repository
+2. Add to your Emacs config:
+   #+BEGIN_SRC elisp
+   (add-to-list 'load-path "/path/to/ox-ghost")
+   (require 'ox-ghost)
+   #+END_SRC
+3. Export with =M-x org-export-dispatch=
+#+END_TOGGLE
+
+#+BEGIN_TOGGLE :heading "Troubleshooting FAQ"
+*Common issues and solutions:*
+
+| Problem | Solution |
+|---------+----------|
+| Empty output | Check UTF-8 encoding |
+| Missing images | Use absolute URLs |
+| Card not rendering | Verify syntax |
+
+For more help, visit the [[https://github.com/ii/ox-ghost/issues][GitHub issues]].
+#+END_TOGGLE
+
+* Button Cards
+
+#+BEGIN_BUTTON :url https://ghost.org :alignment center
+Get Started with Ghost
+#+END_BUTTON
+
+#+BEGIN_BUTTON :url https://github.com/ii/ox-ghost :alignment left
+View Source Code
+#+END_BUTTON
+
+* Header Cards
+
+** V1 Styles
+
+#+BEGIN_HEADER :size large :style image :backgroundImageSrc "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1600" :subheader "Full background image with overlay" :buttonText "Explore" :buttonUrl "https://ghost.org"
+Image Style Header
+#+END_HEADER
+
+#+BEGIN_HEADER :size medium :style dark :subheader "White text on dark background"
+Dark Style Header
+#+END_HEADER
+
+#+BEGIN_HEADER :size medium :style light :subheader "Dark text on light background"
+Light Style Header
+#+END_HEADER
+
+#+BEGIN_HEADER :size medium :style accent :subheader "Uses your theme's accent color"
+Accent Style Header
+#+END_HEADER
+
+** V2 Layouts
+
+#+BEGIN_HEADER :layout split :size large :backgroundImageSrc "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800" :subheader "Image left, content right" :buttonText "Learn More" :buttonUrl "https://ghost.org" :backgroundColor "#1a1a2e"
+Split Layout Header
+#+END_HEADER
+
+#+BEGIN_HEADER :layout split :size large :backgroundImageSrc "https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=800" :subheader "Content left, image right" :buttonText "Get Started" :buttonUrl "https://ghost.org" :backgroundColor "#16213e" :swapped t
+Swapped Split Layout
+#+END_HEADER
+
+#+BEGIN_HEADER :layout full :size large :backgroundColor "#0f3460" :subheader "Full width with custom background color" :buttonText "Subscribe" :buttonUrl "https://example.com"
+Full Layout with Color
+#+END_HEADER
+
+* Bookmark Cards
+
+#+BEGIN_BOOKMARK :url https://ghost.org :title "Ghost: The Creator Economy Platform" :description "The world's most popular modern publishing platform for creating a new media platform." :thumbnail "https://ghost.org/images/meta/ghost.png" :icon "https://ghost.org/favicon.ico"
+Ghost - Publishing Platform
+#+END_BOOKMARK
+
+#+BEGIN_BOOKMARK :url https://github.com/ii/ox-ghost :title "ii/ox-ghost: Org-mode to Ghost Lexical exporter"
+ox-ghost on GitHub
+#+END_BOOKMARK
+
+* Embed Cards
+
+#+BEGIN_EMBED :url https://www.youtube.com/watch?v=jNQXAC9IVRw :html "<iframe width='560' height='315' src='https://www.youtube.com/embed/jNQXAC9IVRw' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' allowfullscreen></iframe>"
+First YouTube Video - Me at the zoo
+#+END_EMBED
+
+* Call-to-Action Cards
+
+#+BEGIN_CTA :url https://ghost.org/pricing :buttonText "Start Free Trial" :buttonColor "#ff5500" :backgroundColor "#1a1a2e"
+Ready to build your audience? Ghost makes it easy to publish, grow, and monetize your content. Join thousands of creators today.
+#+END_CTA
+
+#+BEGIN_CTA :url https://example.com/subscribe :buttonText "Subscribe Now" :buttonColor "#15803d" :backgroundColor "#f0fdf4" :layout immersive
+Get weekly insights delivered to your inbox. No spam, unsubscribe anytime.
+#+END_CTA
+
+* Aside Cards
+
+#+BEGIN_ASIDE
+*About the Author*
+
+This content was created to demonstrate ox-ghost's capabilities. The project bridges org-mode and Ghost CMS, enabling literate programming workflows for content publishing.
+
+Visit [[https://github.com/ii/ox-ghost][the repository]] for more information.
+#+END_ASIDE
+
+#+BEGIN_ASIDE
+*Key Terminology*
+
+- *Lexical* — Meta's rich text editor framework
+- *org-mode* — Emacs' plain-text markup system
+- *ox-ghost* — Bridge between the two worlds
+- *Koenig* — Ghost's editor built on Lexical
+#+END_ASIDE
+
+* Gallery Cards
+
+#+BEGIN_GALLERY :images "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=800,https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=1200&h=800,https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=800,https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200&h=800,https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=1200&h=800,https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=1200&h=800" :caption "Mountain photography collection"
+#+END_GALLERY
+
+* Media Cards
+
+** Video Card
+
+#+BEGIN_VIDEO :src https://example.com/sample-video.mp4 :width 1920 :height 1080 :duration 120 :loop true :cardWidth wide :mimeType "video/mp4"
+Sample video demonstration
+#+END_VIDEO
+
+** Audio Card
+
+#+BEGIN_AUDIO :src https://example.com/podcast.mp3 :duration 1845 :mimeType "audio/mpeg" :thumbnailSrc "https://example.com/cover.jpg"
+Episode 42: The Future of Publishing
+#+END_AUDIO
+
+** File Card
+
+#+BEGIN_FILE :src https://example.com/whitepaper.pdf :fileName ox-ghost-documentation.pdf :fileSize 2457600 :caption "Complete API documentation"
+ox-ghost Documentation v1.0
+#+END_FILE
+
+* Email-Only Cards
+
+#+BEGIN_EMAIL
+<p>Hello {first_name}! This content only appears in email newsletters, not on the web.</p>
+#+END_EMAIL
+
+#+BEGIN_EMAIL-CTA :buttonText "Confirm Email" :buttonUrl https://example.com/confirm
+Thanks for subscribing! Click below to confirm your email address.
+#+END_EMAIL-CTA
+
+* Membership Cards
+
+#+BEGIN_SIGNUP :buttonText "Subscribe Free" :layout split
+Get weekly insights delivered straight to your inbox. No spam, unsubscribe anytime.
+#+END_SIGNUP
+
+#+BEGIN_PRODUCT :url https://example.com/course :buttonText "Enroll Now" :rating 5
+The Complete Ghost Publishing Masterclass
+#+END_PRODUCT
+
+#+BEGIN_PAYWALL
+#+END_PAYWALL
+
+* Integration Cards
+
+#+BEGIN_TRANSISTOR :url https://share.transistor.fm/s/example-episode
+#+END_TRANSISTOR
+
+* Raw Content Cards
+
+** HTML Card
+
+#+BEGIN_EXPORT html
+<div class="custom-banner" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 8px; color: white; text-align: center;">
+  <h3 style="margin: 0;">Custom HTML Card</h3>
+  <p style="margin: 0.5rem 0 0 0;">Full control over markup and styling</p>
+</div>
+#+END_EXPORT
+
+** Markdown Card
+
+#+BEGIN_MARKDOWN
+## Markdown Card Features
+
+This card renders **Markdown** directly, useful for:
+
+- Importing existing content
+- Using Markdown-specific syntax
+- Task lists and footnotes
+
+### Task List
+
+- [x] Set up ox-ghost
+- [x] Create test fixtures
+- [ ] Write documentation
+- [ ] Release v1.0
+
+### Blockquote
+
+> The only way to do great work is to love what you do.
+>
+> — *Steve Jobs*
+
+### Fenced Code
+
+```javascript
+const ghost = require('@tryghost/admin-api');
+await ghost.posts.add({title, lexical});
+```
+
+### Footnotes
+
+Markdown supports footnotes[^1] for references.
+
+[^1]: This appears at the bottom of the rendered content.
+
+---
+
+*Perfect for importing existing Markdown content.*
+#+END_MARKDOWN
+
+* Structural Elements
+
+** Horizontal Rule
+
+Content above the rule.
+
+-----
+
+Content below the rule.
+
+** Tables
+
+| Feature | Status | Notes |
+|---------+--------+-------|
+| Bold | ✅ | Full support |
+| Italic | ✅ | Full support |
+| Code | ✅ | Inline and block |
+| Images | ✅ | All properties |
+| Cards | ✅ | 20+ types |
+
+** Table with Alignment
+
+| Left | Center | Right |
+|:-----|:------:|------:|
+| L1 | C1 | R1 |
+| L2 | C2 | R2 |
+| L3 | C3 | R3 |
+
+* Line Breaks
+
+Line one with explicit break\\
+Line two continues here.
+
+Another paragraph with break\\
+and continuation on next line.
+
+* Special Characters
+
+** HTML Entities
+
+Text with <angle brackets> and &ampersands& and "quotes" here.
+
+Less than: < Greater than: > Ampersand: &
+
+** Unicode
+
+Japanese: 日本語
+Chinese: 中文
+Korean: 한국어
+Arabic: العربية
+Hebrew: עברית
+
+** Emoji
+
+Celebration: 🎉 Rocket: 🚀 Lightbulb: 💡 Warning: ⚠️ Error: ❌ Success: ✅
+
+** Math Symbols
+
+Infinity: ∞ Approximately: ≈ Not equal: ≠ Less/equal: ≤ Greater/equal: ≥
+Plus/minus: ± Multiply: × Divide: ÷ Sum: ∑ Integral: ∫
+
+* Final Notes
+
+This comprehensive style test covers all Ghost Lexical node types:
+
+1. *Text nodes*: paragraph, heading, text (8 formats), linebreak
+2. *List nodes*: list, listitem (ordered, unordered, checkbox)
+3. *Block nodes*: quote, codeblock, horizontalrule
+4. *Card nodes*: image, gallery, video, audio, file, callout, toggle, button, header, bookmark, embed, cta, aside, email, email-cta, signup, product, paywall, transistor, html, markdown
+
+Generated from Ghost's official kg-default-nodes test suite.

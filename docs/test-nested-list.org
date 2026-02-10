@@ -1,0 +1,18 @@
+#+TITLE: Nested List Test
+
+* Unordered Nested Lists
+
+- Level 1 Item A
+  - Level 2 Item A1
+  - Level 2 Item A2
+    - Level 3 Deep
+  - Level 2 Item A3
+- Level 1 Item B
+
+* Ordered Nested Lists
+
+1. First
+2. Second
+   1. Sub A
+   2. Sub B
+3. Third

@@ -1,0 +1,7 @@
+#+TITLE: Highlight Test
+
+* Highlight Examples
+
+This is @@ghost:highlight:important text@@ that should be highlighted.
+
+You can also have @@ghost:highlight:multiple highlighted sections@@ in a paragraph.

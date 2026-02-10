@@ -1,0 +1,29 @@
+#+TITLE: Linebreak Test
+
+* Valid Contexts
+
+** Paragraph with linebreak
+
+Line one\\
+Line two
+
+** Quote with linebreak
+
+#+BEGIN_QUOTE
+Quote line one\\
+Quote line two
+#+END_QUOTE
+
+* Invalid Contexts (should convert to space)
+
+** Listitem with linebreak
+
+- Item with forced\\
+break
+
+** Aside with linebreak
+
+#+BEGIN_ASIDE
+Aside with forced\\
+break
+#+END_ASIDE

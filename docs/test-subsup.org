@@ -1,0 +1,14 @@
+#+TITLE: Subscript/Superscript Test
+#+OPTIONS: ^:t
+
+* Math Examples
+
+H_{2}O is water.
+
+E = mc^{2} is the famous equation.
+
+x^{2} + y^{2} = r^{2}
+
+CO_{2} emissions are a concern.
+
+10^{-3} is one thousandth.

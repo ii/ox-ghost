@@ -763,7 +763,7 @@ async function createPage(options) {
     status: options.status || 'draft',
     tags: options.tags || [],
     feature_image: options.featureImage,
-    excerpt: options.excerpt,
+    custom_excerpt: options.custom_excerpt || options.excerpt,
     slug: options.slug
   };
 
@@ -1115,6 +1115,177 @@ async function unarchiveTier(idOrSlug) {
     });
     req.on('error', reject);
     req.write(body);
+    req.end();
+  });
+}
+
+// ============================================================
+// Staff Management (Roles & Invites)
+// ============================================================
+
+// List available roles
+async function listRoles() {
+  const api = getApi();
+  return new Promise((resolve, reject) => {
+    const token = generateJWT();
+    const url = new URL(config.url);
+    const reqModule = url.protocol === 'https:' ? https : http;
+    const req = reqModule.get(`${config.url}/ghost/api/admin/roles/`, {
+      headers: { 'Authorization': 'Ghost ' + token }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.errors) {
+            reject(new Error(json.errors[0]?.message || 'API Error'));
+          } else {
+            resolve(json.roles || []);
+          }
+        } catch (e) {
+          reject(new Error('Invalid JSON: ' + data.substring(0, 200)));
+        }
+      });
+    });
+    req.on('error', reject);
+  });
+}
+
+// List current staff/users
+async function listStaff() {
+  const token = generateJWT();
+  return new Promise((resolve, reject) => {
+    const url = new URL(config.url);
+    const reqModule = url.protocol === 'https:' ? https : http;
+    const req = reqModule.get(`${config.url}/ghost/api/admin/users/?include=roles`, {
+      headers: { 'Authorization': 'Ghost ' + token }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.errors) {
+            reject(new Error(json.errors[0]?.message || 'API Error'));
+          } else {
+            resolve(json.users || []);
+          }
+        } catch (e) {
+          reject(new Error('Invalid JSON: ' + data.substring(0, 200)));
+        }
+      });
+    });
+    req.on('error', reject);
+  });
+}
+
+// List pending invites
+async function listInvites() {
+  const token = generateJWT();
+  return new Promise((resolve, reject) => {
+    const url = new URL(config.url);
+    const reqModule = url.protocol === 'https:' ? https : http;
+    const req = reqModule.get(`${config.url}/ghost/api/admin/invites/`, {
+      headers: { 'Authorization': 'Ghost ' + token }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.errors) {
+            reject(new Error(json.errors[0]?.message || 'API Error'));
+          } else {
+            resolve(json.invites || []);
+          }
+        } catch (e) {
+          reject(new Error('Invalid JSON: ' + data.substring(0, 200)));
+        }
+      });
+    });
+    req.on('error', reject);
+  });
+}
+
+// Send an invite to a new staff member
+async function inviteUser(email, roleName) {
+  // First, get role ID from name
+  const roles = await listRoles();
+  const role = roles.find(r => r.name.toLowerCase() === roleName.toLowerCase());
+  if (!role) {
+    const available = roles.map(r => r.name).join(', ');
+    throw new Error(`Role "${roleName}" not found. Available: ${available}`);
+  }
+
+  const token = generateJWT();
+  const body = JSON.stringify({
+    invites: [{
+      email: email,
+      role_id: role.id
+    }]
+  });
+
+  return new Promise((resolve, reject) => {
+    const url = new URL(config.url);
+    const reqModule = url.protocol === 'https:' ? https : http;
+    const req = reqModule.request(`${config.url}/ghost/api/admin/invites/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Ghost ' + token,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body)
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.errors) {
+            reject(new Error(json.errors[0]?.message || 'API Error'));
+          } else {
+            console.log(`✓ Invite sent to ${email} as ${role.name}`);
+            resolve(json.invites?.[0] || json);
+          }
+        } catch (e) {
+          reject(new Error('Invalid JSON: ' + data.substring(0, 200)));
+        }
+      });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+// Revoke a pending invite
+async function revokeInvite(inviteId) {
+  const token = generateJWT();
+  return new Promise((resolve, reject) => {
+    const url = new URL(config.url);
+    const reqModule = url.protocol === 'https:' ? https : http;
+    const req = reqModule.request(`${config.url}/ghost/api/admin/invites/${inviteId}/`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Ghost ' + token }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        if (res.statusCode === 204) {
+          console.log(`✓ Invite revoked`);
+          resolve(true);
+        } else {
+          try {
+            const json = JSON.parse(data);
+            reject(new Error(json.errors?.[0]?.message || 'Failed to revoke invite'));
+          } catch (e) {
+            reject(new Error(`HTTP ${res.statusCode}`));
+          }
+        }
+      });
+    });
+    req.on('error', reject);
     req.end();
   });
 }
@@ -1536,29 +1707,47 @@ function handlePageCommand(subCommand, args) {
 
     case 'create':
       if (args.length < 2) {
-        console.log('Usage: ghost.js page create "Title" content.html [--publish]');
-        console.log('       ghost.js page create "Title" content.json [--publish]  (Lexical format)');
+        console.log('Usage: ghost.js page create "Title" content.html [--publish] [--with-metadata]');
+        console.log('       ghost.js page create "Title" content.json [--publish] [--with-metadata]');
         process.exit(1);
       }
       {
         const title = args[0];
         const contentFile = args[1];
         const publish = args.includes('--publish');
+        const withMetadata = args.includes('--with-metadata');
         const content = fs.readFileSync(contentFile, 'utf8');
         const isLexicalFile = contentFile.endsWith('.json');
+        const opts = { title, status: publish ? 'published' : 'draft' };
         if (isLexicalFile) {
-          console.log('Creating page with Lexical content...');
-          createPage({ title, lexical: content, status: publish ? 'published' : 'draft' });
+          opts.lexical = content;
         } else {
-          createPage({ title, html: content, status: publish ? 'published' : 'draft' });
+          opts.html = content;
         }
+        // Read companion metadata file if --with-metadata
+        if (withMetadata) {
+          const metaPath = contentFile.replace(/\.json$/, '-metadata.json').replace(/\.html$/, '-metadata.json');
+          if (fs.existsSync(metaPath)) {
+            const metadata = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+            if (metadata.custom_excerpt) opts.custom_excerpt = metadata.custom_excerpt;
+            if (metadata.tags) opts.tags = metadata.tags.map(t => typeof t === 'string' ? { name: t } : t);
+            if (metadata.slug) opts.slug = metadata.slug;
+            if (metadata.feature_image) opts.featureImage = metadata.feature_image;
+            console.log(`Creating page with Lexical content + metadata from ${path.basename(metaPath)}...`);
+          } else {
+            console.log(`Creating page with ${isLexicalFile ? 'Lexical' : 'HTML'} content (no metadata file found)...`);
+          }
+        } else {
+          console.log(`Creating page with ${isLexicalFile ? 'Lexical' : 'HTML'} content...`);
+        }
+        createPage(opts);
       }
       break;
 
     case 'update':
       if (args.length < 2) {
-        console.log('Usage: ghost.js page update <id-or-slug> lexical.json [--title "New Title"]');
-        console.log('       ghost.js page update <id-or-slug> content.html [--title "New Title"]');
+        console.log('Usage: ghost.js page update <id-or-slug> lexical.json [--title "New Title"] [--with-metadata]');
+        console.log('       ghost.js page update <id-or-slug> content.html [--title "New Title"] [--with-metadata]');
         process.exit(1);
       }
       {
@@ -1566,11 +1755,23 @@ function handlePageCommand(subCommand, args) {
         const updateFile = args[1];
         const titleIdx = args.indexOf('--title');
         const newTitle = titleIdx > -1 ? args[titleIdx + 1] : undefined;
+        const withMetadata = args.includes('--with-metadata');
         getPage(updateSlug).then(page => {
           const content = fs.readFileSync(updateFile, 'utf8');
           const isLexical = updateFile.endsWith('.json');
           const updateOpts = isLexical ? { lexical: content } : { html: content };
           if (newTitle) updateOpts.title = newTitle;
+          // Read companion metadata file if --with-metadata
+          if (withMetadata) {
+            const metaPath = updateFile.replace(/\.json$/, '-metadata.json').replace(/\.html$/, '-metadata.json');
+            if (fs.existsSync(metaPath)) {
+              const metadata = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+              if (metadata.custom_excerpt) updateOpts.custom_excerpt = metadata.custom_excerpt;
+              if (metadata.tags) updateOpts.tags = metadata.tags.map(t => typeof t === 'string' ? { name: t } : t);
+              if (metadata.slug) updateOpts.slug = metadata.slug;
+              if (metadata.feature_image) updateOpts.feature_image = metadata.feature_image;
+            }
+          }
           console.log(`Updating page with ${isLexical ? 'Lexical' : 'HTML'} content...`);
           return updatePage(page.id, updateOpts);
         }).catch(err => {
@@ -1804,6 +2005,81 @@ Returns the Ghost-hosted URL.`);
       }
       break;
 
+    case 'staff':
+    case 'users':
+      {
+        const subCmd = args[1];
+        if (subCmd === 'list' || !subCmd) {
+          listStaff().then(users => {
+            console.log('Staff Members:');
+            users.forEach(u => {
+              const roles = u.roles?.map(r => r.name).join(', ') || 'No role';
+              const status = u.status || 'active';
+              console.log(`  ${status.padEnd(8)} | ${u.email.padEnd(30)} | ${roles} | ${u.name || '(no name)'}`);
+            });
+          }).catch(err => {
+            console.error('Error:', err.message);
+            process.exit(1);
+          });
+        } else if (subCmd === 'roles') {
+          listRoles().then(roles => {
+            console.log('Available Roles:');
+            roles.forEach(r => {
+              console.log(`  ${r.name.padEnd(15)} | ${r.description || ''}`);
+            });
+          }).catch(err => {
+            console.error('Error:', err.message);
+            process.exit(1);
+          });
+        } else if (subCmd === 'invites') {
+          listInvites().then(invites => {
+            if (invites.length === 0) {
+              console.log('No pending invites');
+            } else {
+              console.log('Pending Invites:');
+              invites.forEach(inv => {
+                console.log(`  ${inv.id} | ${inv.email.padEnd(30)} | ${inv.role_id} | expires: ${inv.expires}`);
+              });
+            }
+          }).catch(err => {
+            console.error('Error:', err.message);
+            process.exit(1);
+          });
+        } else if (subCmd === 'invite') {
+          const email = args[2];
+          const role = args[3];
+          if (!email || !role) {
+            console.log('Usage: ghost.js staff invite <email> <role>');
+            console.log('Roles: Contributor, Author, Editor, Administrator');
+            process.exit(1);
+          }
+          inviteUser(email, role).catch(err => {
+            console.error('Error:', err.message);
+            process.exit(1);
+          });
+        } else if (subCmd === 'revoke') {
+          const inviteId = args[2];
+          if (!inviteId) {
+            console.log('Usage: ghost.js staff revoke <invite-id>');
+            console.log('Use "ghost.js staff invites" to see pending invite IDs');
+            process.exit(1);
+          }
+          revokeInvite(inviteId).catch(err => {
+            console.error('Error:', err.message);
+            process.exit(1);
+          });
+        } else {
+          console.log(`Staff Commands:
+  ghost.js staff                         List all staff members
+  ghost.js staff list                    List all staff members
+  ghost.js staff roles                   List available roles
+  ghost.js staff invites                 List pending invites
+  ghost.js staff invite <email> <role>   Send invite (Contributor, Author, Editor, Administrator)
+  ghost.js staff revoke <invite-id>      Revoke pending invite`);
+        }
+      }
+      break;
+
     case 'routes':
       {
         const subCmd = args[1];
@@ -1881,6 +2157,7 @@ Usage:
   ghost.js sync [dir]                          Pull ALL config for git tracking
   ghost.js post <command>                      Manage posts
   ghost.js page <command>                      Manage pages
+  ghost.js staff <command>                     Manage staff & invites
   ghost.js tier <command>                      Manage tiers (archive/unarchive)
   ghost.js routes [command]                    View/pull routes.yaml (read-only)
   ghost.js redirects [command]                 View/pull redirects (read-only)
@@ -1904,6 +2181,13 @@ Page Commands:
   ghost.js page create "Title" file            Create new page
   ghost.js page update <slug> file             Update existing page
   ghost.js page pull <slug> [dir]              Pull page to local directory
+
+Staff Commands:
+  ghost.js staff                               List all staff members
+  ghost.js staff roles                         List available roles
+  ghost.js staff invites                       List pending invites
+  ghost.js staff invite <email> <role>         Send invite (Contributor, Author, Editor, Administrator)
+  ghost.js staff revoke <invite-id>            Revoke pending invite
 
 Round-trip Workflow:
   1. Pull:   ./ghost.js post pull my-slug ./drafts
@@ -1932,6 +2216,7 @@ module.exports = {
   uploadFile,
   fetchConfig, saveConfig,
   archiveTier, unarchiveTier,
+  listRoles, listStaff, listInvites, inviteUser, revokeInvite,
   getCodeInjection, setCodeInjection, updateFooterFromFile,
   getRoutes, getRedirects, syncAll,
   cards, config

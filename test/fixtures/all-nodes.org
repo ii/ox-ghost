@@ -1,0 +1,230 @@
+#+TITLE: ox-ghost Unit Test Fixtures
+#+AUTHOR: Test Suite
+#+DESCRIPTION: Minimal test cases for each node type - edge cases and error handling
+
+This file contains minimal, focused test cases for unit testing ox-ghost.
+For a comprehensive style guide, see ghost-style-test.org.
+
+* Text Formats (Minimal)
+
+*bold* /italic/ _underline_ +strike+ ~code~ =verbatim=
+
+H_{2}O (subscript) and E=mc^{2} (superscript)
+
+@@ghost:highlight:highlighted@@
+
+Combined */bold-italic/* and */_triple_/*
+
+* Headings (All Levels)
+
+** Level 2
+*** Level 3
+**** Level 4
+***** Level 5
+****** Level 6 (max)
+
+* Lists (Minimal)
+
+- Bullet
+  - Nested
+    - Deep
+
+1) Numbered
+2) Second
+
+- [X] Checked
+- [ ] Unchecked
+- [-] Partial
+
+* Quotes (Minimal)
+
+#+BEGIN_QUOTE
+Single quote block.
+#+END_QUOTE
+
+* Code Blocks (Minimal)
+
+#+BEGIN_SRC javascript
+console.log("test");
+#+END_SRC
+
+#+BEGIN_SRC elisp
+(message "ox-ghost test")
+#+END_SRC
+
+#+BEGIN_SRC
+No language specified.
+#+END_SRC
+
+: Fixed width line
+
+* Links (Minimal)
+
+[[https://example.com][Link with text]]
+
+[[https://example.com/path]]
+
+* Images
+
+** Minimal Image
+
+[[https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400][Alt text]]
+
+** All Properties
+
+#+ATTR_LEXICAL: :caption "Caption" :title "Title" :cardWidth wide :href "https://example.com"
+[[https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=800][Alt with all props]]
+
+** Broken Image (Edge Case)
+
+[[https://example.invalid/broken.jpg][This alt text shows when image fails]]
+
+* Card Edge Cases
+
+** Callout - Minimal
+
+#+BEGIN_CALLOUT :emoji 💡 :color blue
+Minimal callout.
+#+END_CALLOUT
+
+** Callout - No Emoji
+
+#+BEGIN_CALLOUT :color grey
+No emoji variant.
+#+END_CALLOUT
+
+** Toggle - Minimal
+
+#+BEGIN_TOGGLE :heading "Toggle"
+Content.
+#+END_TOGGLE
+
+** Button - Minimal
+
+#+BEGIN_BUTTON :url https://example.com
+Button
+#+END_BUTTON
+
+** Header - V1 Minimal
+
+#+BEGIN_HEADER :size small :style dark
+Minimal header
+#+END_HEADER
+
+** Header - V2 Minimal
+
+#+BEGIN_HEADER :layout split :backgroundColor "#000"
+V2 header
+#+END_HEADER
+
+** Bookmark - Minimal
+
+#+BEGIN_BOOKMARK :url https://example.com :title "Title"
+Bookmark
+#+END_BOOKMARK
+
+** Embed - URL Only (No HTML)
+
+#+BEGIN_EMBED :url https://www.youtube.com/watch?v=dQw4w9WgXcQ
+Embed without pre-fetched HTML
+#+END_EMBED
+
+** Embed - With HTML
+
+#+BEGIN_EMBED :url https://www.youtube.com/watch?v=jNQXAC9IVRw :html "<iframe src='https://www.youtube.com/embed/jNQXAC9IVRw'></iframe>"
+Embed with HTML
+#+END_EMBED
+
+** CTA - Minimal
+
+#+BEGIN_CTA :url https://example.com :buttonText "Click"
+CTA text.
+#+END_CTA
+
+** Aside - Minimal
+
+#+BEGIN_ASIDE
+Aside content.
+#+END_ASIDE
+
+** Gallery - Minimal
+
+#+BEGIN_GALLERY :images "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400,https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=600&h=400"
+#+END_GALLERY
+
+** Video - Minimal
+
+#+BEGIN_VIDEO :src https://example.com/video.mp4 :width 1920 :height 1080
+Video
+#+END_VIDEO
+
+** Audio - Minimal
+
+#+BEGIN_AUDIO :src https://example.com/audio.mp3 :duration 120
+Audio
+#+END_AUDIO
+
+** File - Minimal
+
+#+BEGIN_FILE :src https://example.com/file.pdf :fileName file.pdf
+File
+#+END_FILE
+
+** Email Cards
+
+#+BEGIN_EMAIL
+Email only content.
+#+END_EMAIL
+
+#+BEGIN_EMAIL-CTA :buttonText "Confirm" :buttonUrl https://example.com
+Email CTA.
+#+END_EMAIL-CTA
+
+** Membership Cards
+
+#+BEGIN_SIGNUP :buttonText "Subscribe"
+Signup.
+#+END_SIGNUP
+
+#+BEGIN_PRODUCT :url https://example.com :buttonText "Buy"
+Product.
+#+END_PRODUCT
+
+#+BEGIN_PAYWALL
+#+END_PAYWALL
+
+** Integration Cards
+
+#+BEGIN_TRANSISTOR :url https://share.transistor.fm/s/test
+#+END_TRANSISTOR
+
+** Raw Content
+
+#+BEGIN_EXPORT html
+<div>HTML</div>
+#+END_EXPORT
+
+#+BEGIN_MARKDOWN
+**Markdown**
+#+END_MARKDOWN
+
+* Structural Elements
+
+-----
+
+| A | B |
+|---+---|
+| 1 | 2 |
+
+* Line Breaks
+
+Line one\\
+Line two.
+
+* Special Characters
+
+<angle> &amp; "quotes"
+
+Unicode: 日本語 αβγ
+
+Emoji: 🎉 ✅

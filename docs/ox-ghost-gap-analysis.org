@@ -1,0 +1,214 @@
+#+TITLE: ox-ghost Gap Analysis
+#+SUBTITLE: Comparing ox-ghost.el to Ghost Lexical Structure
+#+DATE: 2026-01-30
+
+* Summary
+
+This analysis compares the current ox-ghost.el implementation against the Ghost Node Reference to identify gaps and improvements.
+
+* Format Bitmask Coverage
+
+| Bit | Value | Format        | Org Syntax   | ox-ghost.el | Status    |
+|-----+-------+---------------+--------------+-------------+-----------|
+|   0 |     1 | Bold          | =*bold*=     | YES         | Complete  |
+|   1 |     2 | Italic        | =/italic/=   | YES         | Complete  |
+|   2 |     4 | Strikethrough | =+strike+=   | YES         | Complete  |
+|   3 |     8 | Underline     | =_under_=    | YES         | Complete  |
+|   4 |    16 | Code          | ~=code=~     | YES         | Complete  |
+|   5 |    32 | Subscript     | =_{sub}=     | NO          | *MISSING* |
+|   6 |    64 | Superscript   | =^{super}=   | NO          | *MISSING* |
+|   7 |   128 | Highlight     | (none)       | NO          | *MISSING* |
+
+** Action Items
+- [ ] Add =ox-ghost--format-subscript= constant (32)
+- [ ] Add =ox-ghost--format-superscript= constant (64)
+- [ ] Add =ox-ghost--format-highlight= constant (128)
+- [ ] Add subscript/superscript transcoders
+- [ ] Consider custom syntax for highlight (=@@hl:text@@=?)
+
+* Node Type Coverage
+
+** ElementNode (Containers)
+
+| Node      | ox-ghost.el | Transcoder              | Status   |
+|-----------+-------------+-------------------------+----------|
+| root      | YES         | ox-ghost--template      | Complete |
+| paragraph | YES         | ox-ghost--paragraph     | Complete |
+| heading   | YES         | ox-ghost--headline      | Complete |
+| quote     | YES         | ox-ghost--quote-block   | Complete |
+| aside     | YES         | special-block ASIDE     | Complete |
+| list      | YES         | ox-ghost--plain-list    | Complete |
+| listitem  | YES         | ox-ghost--item          | Complete |
+| link      | YES         | ox-ghost--link          | Complete |
+
+** Leaf Nodes
+
+| Node       | ox-ghost.el | Transcoder            | Status   |
+|------------+-------------+-----------------------+----------|
+| text       | YES         | ox-ghost--text-node   | Complete |
+| linebreak  | YES         | ox-ghost--line-break  | *ISSUE*  |
+
+** DecoratorNode (Cards)
+
+| Node            | ox-ghost.el | Block Type     | Status    |
+|-----------------+-------------+----------------+-----------|
+| callout         | YES         | CALLOUT        | Complete  |
+| toggle          | YES         | TOGGLE         | Complete  |
+| codeblock       | YES         | src-block      | Complete  |
+| image           | YES         | link to image  | Complete  |
+| gallery         | YES         | GALLERY        | Complete  |
+| video           | YES         | VIDEO          | Complete  |
+| audio           | YES         | AUDIO          | Complete  |
+| file            | YES         | FILE           | Complete  |
+| embed           | YES         | EMBED          | Complete  |
+| bookmark        | YES         | BOOKMARK       | Complete  |
+| html            | YES         | export HTML    | Complete  |
+| markdown        | NO          | —              | *MISSING* |
+| button          | YES         | BUTTON         | Complete  |
+| call-to-action  | YES         | CTA            | Complete  |
+| signup          | YES         | SIGNUP         | Complete  |
+| product         | YES         | PRODUCT        | Complete  |
+| email           | YES         | EMAIL          | Complete  |
+| email-cta       | NO          | —              | *MISSING* |
+| horizontalrule  | YES         | horizontal-rule| Complete  |
+| paywall         | YES         | PAYWALL        | Complete  |
+| transistor      | YES         | TRANSISTOR     | Complete  |
+
+* Structural Issues
+
+** Linebreak Restrictions
+
+*Problem*: ox-ghost emits linebreak nodes everywhere, but they're only valid in:
+- paragraph (YES)
+- quote (YES)
+- heading (NO - single line)
+- aside (NO - single line)
+- listitem (NO - single line)
+- link (NO - text only)
+
+*Current code* (line 740-743):
+#+BEGIN_SRC elisp
+(defun ox-ghost--line-break (lb contents info)
+  "Transcode LINE-BREAK to Lexical linebreak node."
+  (ox-ghost--node "linebreak"))
+#+END_SRC
+
+*Fix needed*: Check parent context and either:
+1. Emit linebreak only in paragraph/quote
+2. Convert to space in other contexts
+3. Split into multiple nodes (e.g., multiple list items)
+
+** Type Name Consistency
+
+Ghost uses both =text= and =extended-text=, =heading= and =extended-heading=.
+
+Current ox-ghost uses:
+- ="text"= for text nodes
+- ="heading"= for heading nodes
+- ="quote"= for quote nodes
+
+*Verify*: Does Ghost's renderer accept both? If not, may need to use extended- variants.
+
+** Version Property
+
+Some nodes include =version: 1=, some don't. Should be consistent.
+
+Current: =ox-ghost--node= always adds version.
+Text nodes via =ox-ghost--text-node= also add version.
+
+*Verify*: Are version properties required on all nodes or just DecoratorNodes?
+
+* Missing Card Support
+
+** email-cta
+
+Different from =email= block - includes button and segment targeting.
+
+#+BEGIN_SRC org
+,#+BEGIN_EMAIL-CTA :segment "status:free" :buttonText "Upgrade"
+Exclusive content for members.
+,#+END_EMAIL-CTA
+#+END_SRC
+
+** markdown
+
+Raw markdown content (converted on render).
+
+#+BEGIN_SRC org
+,#+BEGIN_MARKDOWN
+# Heading
+Some **markdown** content.
+,#+END_MARKDOWN
+#+END_SRC
+
+* Proposed Restructuring
+
+** 1. Organize by Ghost Structure
+
+Current ox-ghost.el mixes concerns. Propose restructuring into sections:
+
+#+BEGIN_SRC text
+;;; Node Constructors
+;;;; ElementNode constructors (have children)
+;;;; TextNode constructors (leaf)
+;;;; DecoratorNode constructors (cards)
+
+;;; Transcoders
+;;;; Block-level (map to root children)
+;;;; Inline (map to paragraph/heading children)
+;;;; Cards (map to DecoratorNodes)
+
+;;; Validation
+;;;; Containment rules
+;;;; Linebreak restrictions
+#+END_SRC
+
+** 2. Add Containment Validation
+
+#+BEGIN_SRC elisp
+(defconst ox-ghost--valid-children
+  '((root . (paragraph heading quote aside list
+             ;; All card types...
+             callout toggle codeblock image))
+    (paragraph . (text link linebreak))
+    (heading . (text link))  ; NO linebreak
+    (quote . (text link linebreak))
+    (aside . (text link))    ; NO linebreak
+    (list . (listitem))
+    (listitem . (text link list))  ; NO linebreak, can nest list
+    (link . (text)))  ; text only
+  "Valid children for each container node.")
+#+END_SRC
+
+** 3. Explicit Base Properties
+
+Ensure all ElementNodes get base properties:
+
+#+BEGIN_SRC elisp
+(defun ox-ghost--element-node (type children &rest props)
+  "Create ElementNode with standard base properties."
+  (apply #'ox-ghost--node type
+         `(children . ,children)
+         '(direction . "ltr")
+         '(format . "")
+         '(indent . 0)
+         props))
+#+END_SRC
+
+* Summary of Changes Needed
+
+** High Priority
+1. [ ] Fix linebreak to respect containment rules
+2. [ ] Add subscript/superscript support
+3. [ ] Add email-cta card support
+4. [ ] Verify type names (text vs extended-text)
+
+** Medium Priority
+5. [ ] Add markdown card support
+6. [ ] Add containment validation
+7. [ ] Restructure code by Ghost node categories
+8. [ ] Consistent version property handling
+
+** Low Priority
+9. [ ] Add highlight format support (needs org syntax)
+10. [ ] Add more card property support (width, visibility, etc.)

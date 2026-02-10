@@ -1,0 +1,460 @@
+#+TITLE: Ghost Lexical Comprehensive Test
+#+SUBTITLE: Testing All Node Types
+#+AUTHOR: ox-ghost Test Suite
+#+DATE: 2026-01-30
+#+DESCRIPTION: Comprehensive test of all Ghost Lexical node types
+
+#+GHOST_SLUG: ghost-comprehensive-test
+#+GHOST_STATUS: draft
+#+GHOST_TAGS: test, documentation, ox-ghost
+
+This document tests every Ghost Lexical node type to verify ox-ghost mapping.
+
+* ElementNode Tests
+
+** Root and Document Structure
+
+The document root wraps all content. This paragraph is a direct child of root.
+
+** Paragraph Node
+
+This is a simple paragraph with plain text.
+
+This is a second paragraph, demonstrating that blank lines create separate paragraph nodes.
+
+A paragraph with *bold*, /italic/, =code=, and [[https://example.com][a link]] inline.
+
+** Heading Nodes
+
+*** Level 3 Heading (h4 in Ghost)
+
+**** Level 4 Heading (h5 in Ghost)
+
+***** Level 5 Heading (h6 in Ghost)
+
+** Quote Node
+
+#+BEGIN_QUOTE
+This is a standard blockquote.
+It can span multiple lines.
+
+With a line break in the middle.
+#+END_QUOTE
+
+** Aside Node (Pull Quote)
+
+#+BEGIN_ASIDE
+This renders as a visually distinct pull quote.
+Large, stylized text for emphasis.
+#+END_ASIDE
+
+** List Nodes
+
+*** Unordered List
+
+- Apple
+- Banana
+- Cherry
+  - Sub-item one
+  - Sub-item two
+    - Deep nested
+- Back to top level
+
+*** Ordered List
+
+1. First step
+2. Second step
+3. Third step
+   1. Sub-step A
+   2. Sub-step B
+4. Fourth step
+
+*** Mixed Formatting in Lists
+
+- *Bold item*
+- /Italic item/
+- Item with =inline code=
+- Item with [[https://example.com][a link]]
+
+*** Checkbox Lists (Unordered)
+
+- [ ] Unchecked task
+- [X] Completed task
+- [ ] Another pending task
+  - [ ] Nested unchecked
+  - [X] Nested checked
+
+*** Checkbox Lists (Ordered)
+
+1. [ ] First task (pending)
+2. [X] Second task (done)
+3. [ ] Third task (pending)
+   1. [X] Sub-task completed
+   2. [ ] Sub-task pending
+
+** Link Node
+
+Simple URL: [[https://ghost.org]]
+
+Link with text: [[https://ghost.org][Ghost Publishing Platform]]
+
+Email link: [[mailto:hello@example.com][Contact Us]]
+
+* TextNode Tests
+
+** Format Bitmask Combinations
+
+| Format           | Org Syntax     | Expected Bitmask |
+|------------------+----------------+------------------|
+| Plain            | plain          |                0 |
+| Bold             | *bold*         |                1 |
+| Italic           | /italic/       |                2 |
+| Bold+Italic      | */both/*       |                3 |
+| Strikethrough    | +strike+       |                4 |
+| Bold+Strike      | *+both+*       |                5 |
+| Underline        | _under_        |                8 |
+| Bold+Underline   | *_both_*       |                9 |
+| Code             | =code=         |               16 |
+| Subscript        | text_{sub}     |               32 |
+| Superscript      | text^{sup}     |               64 |
+| Highlight        | (see below)    |              128 |
+
+Testing combinations inline:
+
+Plain text, *bold text*, /italic text/, +strikethrough+, _underlined_.
+
+Combined: */bold italic/*, *+bold strikethrough+*, /_italic underline_/.
+
+Triple: */_all three_/*.
+
+** Subscript and Superscript
+#+OPTIONS: ^:t
+
+H_{2}O (water), CO_{2} (carbon dioxide), E=mc^{2}, x^{2}+y^{2}=r^{2}
+
+** Highlighted Text
+
+Highlight uses export snippet syntax: =@@ghost:highlight:text@@=
+
+Example: This has @@ghost:highlight:highlighted text@@ inline.
+
+** Inline Code
+
+Using =equals= for inline code renders with format bitmask 16.
+
+Using ~tilde~ for verbatim also renders as code.
+
+* DecoratorNode (Card) Tests
+
+** Text & Callout Cards
+
+*** Callout - Blue
+
+#+BEGIN_CALLOUT :emoji "💡" :color blue
+A blue callout with a lightbulb emoji. Great for tips and hints.
+#+END_CALLOUT
+
+*** Callout - Yellow Warning
+
+#+BEGIN_CALLOUT :emoji "⚠️" :color yellow
+Warning! This is important information you shouldn't miss.
+#+END_CALLOUT
+
+*** Callout - Red Error
+
+#+BEGIN_CALLOUT :emoji "🚨" :color red
+Error or critical warning. Something went wrong.
+#+END_CALLOUT
+
+*** Callout - Green Success
+
+#+BEGIN_CALLOUT :emoji "✅" :color green
+Success! Everything completed correctly.
+#+END_CALLOUT
+
+*** Callout - Grey Note
+
+#+BEGIN_CALLOUT :emoji "📝" :color grey
+A neutral note or aside information.
+#+END_CALLOUT
+
+*** Toggle (Collapsible)
+
+#+BEGIN_TOGGLE :heading "What is Ghost?"
+Ghost is a powerful open source publishing platform. It's built with a focus on professional publishing.
+
+- Modern technology stack
+- Built-in membership features
+- Native newsletter support
+#+END_TOGGLE
+
+#+BEGIN_TOGGLE :heading "Code Example Inside Toggle"
+Here's some code:
+
+#+BEGIN_SRC javascript
+const ghost = require('ghost');
+ghost.start();
+#+END_SRC
+#+END_TOGGLE
+
+*** Code Block
+
+#+BEGIN_SRC javascript
+// JavaScript code block
+function greet(name) {
+  return `Hello, ${name}!`;
+}
+
+console.log(greet('Ghost'));
+#+END_SRC
+
+#+BEGIN_SRC python
+# Python code block
+def greet(name):
+    return f"Hello, {name}!"
+
+print(greet("Ghost"))
+#+END_SRC
+
+#+BEGIN_SRC bash
+# Shell script
+echo "Hello from bash"
+npm install ghost
+#+END_SRC
+
+#+BEGIN_SRC text
+Plain text code block
+No syntax highlighting
+#+END_SRC
+
+** Media Cards
+
+*** Image - Regular Width
+
+[[https://images.unsplash.com/photo-1518770660439-4636190af475?w=800]]
+
+*** Image - Wide
+
+#+ATTR_LEXICAL: :cardWidth wide
+[[https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200]]
+
+*** Image - Full Width
+
+#+ATTR_LEXICAL: :cardWidth full
+[[https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=1600]]
+
+*** Image with Alt Text and Caption
+
+#+ATTR_LEXICAL: :caption "Code on screen - demonstrating caption support" :width 800 :height 533
+[[https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800][A laptop displaying code on screen]]
+
+*** Gallery
+
+#+BEGIN_GALLERY :images "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop, https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop, https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=300&fit=crop, https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=300&fit=crop"
+#+END_GALLERY
+
+*** Video
+
+#+BEGIN_VIDEO :src "https://download.samplelib.com/mp4/sample-5s.mp4" :width 1280 :height 720 :duration 5 :mimeType "video/mp4" :thumbnailSrc "https://images.unsplash.com/photo-1536240478700-b869070f9279?w=640"
+Sample 5-second test video with thumbnail
+#+END_VIDEO
+
+*** Audio
+
+#+BEGIN_AUDIO :src "https://download.samplelib.com/mp3/sample-3s.mp3" :duration 3 :mimeType "audio/mpeg" :thumbnailSrc "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=200"
+Sample Audio Track (3 seconds)
+#+END_AUDIO
+
+*** File Download
+
+#+BEGIN_FILE :src "https://www.w3.org/WAI/WCAG21/Techniques/pdf/img/table-word.pdf" :fileName "accessibility-guide.pdf" :fileSize 54000
+Web Accessibility Guidelines (PDF)
+#+END_FILE
+
+** Embed & Link Cards
+
+*** Embed (YouTube)
+
+#+BEGIN_EMBED :url "https://www.youtube.com/watch?v=dQw4w9WgXcQ" :html "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\"></iframe>"
+Never Gonna Give You Up
+#+END_EMBED
+
+*** Bookmark
+
+#+BEGIN_BOOKMARK :url "https://ghost.org" :title "Ghost: The Professional Publishing Platform" :description "Turn your audience into a business. Publishing, memberships, and subscriptions."
+Ghost
+#+END_BOOKMARK
+
+*** Raw HTML
+
+#+BEGIN_EXPORT html
+<div style="padding: 20px; background: #f5f5f5; border-radius: 8px;">
+  <h3>Custom HTML Block</h3>
+  <p>This is raw HTML passed through to Ghost.</p>
+</div>
+#+END_EXPORT
+
+*** Markdown Card
+
+#+BEGIN_MARKDOWN
+# Markdown Heading
+
+This is **bold** and *italic* in markdown syntax.
+
+- Bullet point one
+- Bullet point two
+#+END_MARKDOWN
+
+** Action Cards
+
+*** Button - Centered
+
+#+BEGIN_BUTTON :url "https://ghost.org/pricing" :alignment center
+View Pricing
+#+END_BUTTON
+
+*** Button - Left Aligned
+
+#+BEGIN_BUTTON :url "https://ghost.org/docs" :alignment left
+Read Documentation
+#+END_BUTTON
+
+*** Button - Right Aligned
+
+#+BEGIN_BUTTON :url "https://ghost.org/download" :alignment right
+Download Ghost
+#+END_BUTTON
+
+*** Call to Action - Minimal
+
+#+BEGIN_CTA :layout minimal :url "https://example.com" :buttonText "Learn More"
+Discover the power of Ghost publishing.
+#+END_CTA
+
+*** Call to Action - Immersive
+
+#+BEGIN_CTA :layout immersive :url "https://example.com" :buttonText "Get Started" :backgroundColor grey
+Transform your publishing workflow with Ghost. Professional tools for professional publishers.
+#+END_CTA
+
+*** Signup Form
+
+#+BEGIN_SIGNUP :layout wide :buttonText "Subscribe Now"
+Join our newsletter
+#+END_SIGNUP
+
+*** Product Card
+
+#+BEGIN_PRODUCT :url "https://shop.example.com/product" :buttonText "Buy Now"
+Ghost Pro Membership
+#+END_PRODUCT
+
+** Email-Specific Cards
+
+*** Email-Only Content
+
+#+BEGIN_EMAIL
+This paragraph only appears in email newsletters.
+It's hidden on the web version of the post.
+
+Perfect for subscriber-exclusive messages.
+#+END_EMAIL
+
+*** Email CTA Card
+
+#+BEGIN_EMAIL-CTA :segment "status:free" :buttonText "Upgrade Now" :buttonUrl "https://example.com/upgrade"
+Unlock premium features. Upgrade your membership today!
+#+END_EMAIL-CTA
+
+** Membership Cards
+
+*** Paywall Marker
+
+Everything above this line is public.
+
+#+BEGIN_PAYWALL
+#+END_PAYWALL
+
+Everything below this line requires membership.
+
+This is premium content only visible to members.
+
+** Specialty Cards
+
+*** Header Card
+
+#+BEGIN_HEADER :size large
+Big Hero Header
+#+END_HEADER
+
+*** Transistor Podcast
+
+#+BEGIN_TRANSISTOR :url "https://share.transistor.fm/e/episode-slug"
+#+END_TRANSISTOR
+
+** Marker Nodes
+
+*** Horizontal Rule
+
+Above the line.
+
+-----
+
+Below the line.
+
+* Containment Edge Cases
+
+** Paragraph with All Inline Types
+
+This paragraph contains *bold*, /italic/, +strikethrough+, _underline_, =code=, and [[https://example.com][links]].
+It also has a line break here\\
+and continues on the next line within the same paragraph.
+
+** Quote with Formatting
+
+#+BEGIN_QUOTE
+A quote with *bold text* and /italic text/.
+Also with a [[https://example.com][link inside]].
+#+END_QUOTE
+
+** List with Rich Content
+
+- *Bold list item*
+- Item with =inline code= and [[https://example.com][a link]]
+- /Italic item with/ *bold mixed in*
+
+** Deeply Nested List
+
+- Level 1
+  - Level 2
+    - Level 3
+      - Level 4
+        - Level 5
+      - Back to 4
+    - Back to 3
+  - Back to 2
+- Back to 1
+
+* Tables (HTML Card)
+
+Tables convert to HTML cards since Ghost doesn't have native table nodes:
+
+| Column A | Column B | Column C |
+|----------+----------+----------|
+| Value 1  | Value 2  | Value 3  |
+| Value 4  | Value 5  | Value 6  |
+| Value 7  | Value 8  | Value 9  |
+
+* Conclusion
+
+This comprehensive test covers all Ghost Lexical node types supported by ox-ghost:
+
+- ElementNodes: root, paragraph, heading, quote, aside, list, listitem, link
+- TextNode: With all format bitmask combinations
+- DecoratorNodes: All 21 card types
+
+Use this file to verify correct JSON output and HTML rendering.
+
+# Local Variables:
+# org-export-with-toc: nil
+# End:

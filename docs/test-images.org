@@ -1,0 +1,19 @@
+#+TITLE: Image Test
+
+* Images
+
+** With Extension
+
+[[https://example.com/photo.jpg]]
+
+** Unsplash (query params)
+
+[[https://images.unsplash.com/photo-1518770660439-4636190af475?w=800]]
+
+** With Alt Text
+
+[[https://example.com/cat.jpg][A fluffy orange cat]]
+
+** Regular Link (not an image)
+
+[[https://ghost.org][Ghost Website]]

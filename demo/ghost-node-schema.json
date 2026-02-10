@@ -1,0 +1,815 @@
+{
+  "audio": {
+    "nodeType": "audio",
+    "file": "audio/AudioNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/audio/AudioNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "duration",
+        "default": 0
+      },
+      {
+        "name": "mimeType",
+        "default": ""
+      },
+      {
+        "name": "src",
+        "default": "",
+        "urlType": "url"
+      },
+      {
+        "name": "title",
+        "default": ""
+      },
+      {
+        "name": "thumbnailSrc",
+        "default": ""
+      }
+    ],
+    "oxBlock": "AUDIO"
+  },
+  "bookmark": {
+    "nodeType": "bookmark",
+    "file": "bookmark/BookmarkNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/bookmark/BookmarkNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "title",
+        "default": "",
+        "wordCount": true
+      },
+      {
+        "name": "description",
+        "default": "",
+        "wordCount": true
+      },
+      {
+        "name": "url",
+        "default": "",
+        "urlType": "url",
+        "wordCount": true
+      },
+      {
+        "name": "caption",
+        "default": "",
+        "wordCount": true
+      },
+      {
+        "name": "author",
+        "default": ""
+      },
+      {
+        "name": "publisher",
+        "default": ""
+      },
+      {
+        "name": "icon",
+        "default": "",
+        "urlType": "url"
+      },
+      {
+        "name": "thumbnail",
+        "default": "",
+        "urlType": "url"
+      }
+    ],
+    "oxBlock": "BOOKMARK"
+  },
+  "button": {
+    "nodeType": "button",
+    "file": "button/ButtonNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/button/ButtonNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "buttonText",
+        "default": ""
+      },
+      {
+        "name": "alignment",
+        "default": "center",
+        "values": [
+          "left",
+          "center",
+          "right"
+        ]
+      },
+      {
+        "name": "buttonUrl",
+        "default": "",
+        "urlType": "url"
+      }
+    ],
+    "oxBlock": "BUTTON"
+  },
+  "call-to-action": {
+    "nodeType": "call-to-action",
+    "file": "call-to-action/CallToActionNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/call-to-action/CallToActionNode.js",
+    "hasVisibility": true,
+    "properties": [
+      {
+        "name": "layout",
+        "default": "minimal",
+        "values": [
+          "minimal",
+          "immersive",
+          "branded"
+        ]
+      },
+      {
+        "name": "alignment",
+        "default": "left",
+        "values": [
+          "left",
+          "center",
+          "right"
+        ]
+      },
+      {
+        "name": "textValue",
+        "default": "",
+        "wordCount": true
+      },
+      {
+        "name": "showButton",
+        "default": true
+      },
+      {
+        "name": "showDividers",
+        "default": true
+      },
+      {
+        "name": "buttonText",
+        "default": "Learn more"
+      },
+      {
+        "name": "buttonUrl",
+        "default": ""
+      },
+      {
+        "name": "buttonColor",
+        "default": "#000000"
+      },
+      {
+        "name": "buttonTextColor",
+        "default": "#ffffff"
+      },
+      {
+        "name": "hasSponsorLabel",
+        "default": true
+      },
+      {
+        "name": "sponsorLabel",
+        "default": "<p><span style="
+      },
+      {
+        "name": "backgroundColor",
+        "default": "grey",
+        "values": [
+          "white",
+          "grey",
+          "blue",
+          "green",
+          "yellow",
+          "red",
+          "pink",
+          "purple",
+          "accent"
+        ]
+      },
+      {
+        "name": "linkColor",
+        "default": "text"
+      },
+      {
+        "name": "imageUrl",
+        "default": ""
+      },
+      {
+        "name": "imageWidth",
+        "default": null
+      },
+      {
+        "name": "imageHeight",
+        "default": null
+      }
+    ],
+    "oxBlock": "CTA"
+  },
+  "callout": {
+    "nodeType": "callout",
+    "file": "callout/CalloutNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/callout/CalloutNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "calloutText",
+        "default": "",
+        "wordCount": true
+      },
+      {
+        "name": "calloutEmoji",
+        "default": "💡"
+      },
+      {
+        "name": "backgroundColor",
+        "default": "blue",
+        "values": [
+          "white",
+          "grey",
+          "blue",
+          "green",
+          "yellow",
+          "red",
+          "pink",
+          "purple",
+          "accent"
+        ]
+      }
+    ],
+    "oxBlock": "CALLOUT"
+  },
+  "codeblock": {
+    "nodeType": "codeblock",
+    "file": "codeblock/CodeBlockNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/codeblock/CodeBlockNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "code",
+        "default": "",
+        "wordCount": true
+      },
+      {
+        "name": "language",
+        "default": ""
+      },
+      {
+        "name": "caption",
+        "default": "",
+        "urlType": "html",
+        "wordCount": true
+      }
+    ]
+  },
+  "email": {
+    "nodeType": "email",
+    "file": "email/EmailNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/email/EmailNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "html",
+        "default": "",
+        "urlType": "html"
+      }
+    ],
+    "oxBlock": "EMAIL"
+  },
+  "email-cta": {
+    "nodeType": "email-cta",
+    "file": "email-cta/EmailCtaNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/email-cta/EmailCtaNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "alignment",
+        "default": "left",
+        "values": [
+          "left",
+          "center",
+          "right"
+        ]
+      },
+      {
+        "name": "buttonText",
+        "default": ""
+      },
+      {
+        "name": "buttonUrl",
+        "default": "",
+        "urlType": "url"
+      },
+      {
+        "name": "html",
+        "default": "",
+        "urlType": "html"
+      },
+      {
+        "name": "segment",
+        "default": "status:free"
+      },
+      {
+        "name": "showButton",
+        "default": false
+      },
+      {
+        "name": "showDividers",
+        "default": true
+      }
+    ]
+  },
+  "embed": {
+    "nodeType": "embed",
+    "file": "embed/EmbedNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/embed/EmbedNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "url",
+        "default": "",
+        "urlType": "url"
+      },
+      {
+        "name": "embedType",
+        "default": ""
+      },
+      {
+        "name": "html",
+        "default": ""
+      },
+      {
+        "name": "metadata"
+      },
+      {
+        "name": "caption",
+        "default": "",
+        "wordCount": true
+      }
+    ],
+    "oxBlock": "EMBED"
+  },
+  "file": {
+    "nodeType": "file",
+    "file": "file/FileNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/file/FileNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "src",
+        "default": "",
+        "urlType": "url"
+      },
+      {
+        "name": "fileTitle",
+        "default": "",
+        "wordCount": true
+      },
+      {
+        "name": "fileCaption",
+        "default": "",
+        "wordCount": true
+      },
+      {
+        "name": "fileName",
+        "default": ""
+      },
+      {
+        "name": "fileSize",
+        "default": ""
+      }
+    ],
+    "oxBlock": "FILE"
+  },
+  "header": {
+    "nodeType": "header",
+    "file": "header/HeaderNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/header/HeaderNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "size",
+        "default": "small",
+        "values": [
+          "small",
+          "medium",
+          "large"
+        ]
+      },
+      {
+        "name": "style",
+        "default": "dark"
+      },
+      {
+        "name": "buttonEnabled",
+        "default": false
+      },
+      {
+        "name": "buttonUrl",
+        "default": "",
+        "urlType": "url"
+      },
+      {
+        "name": "buttonText",
+        "default": ""
+      },
+      {
+        "name": "header",
+        "default": "",
+        "urlType": "html",
+        "wordCount": true
+      },
+      {
+        "name": "subheader",
+        "default": "",
+        "urlType": "html",
+        "wordCount": true
+      },
+      {
+        "name": "backgroundImageSrc",
+        "default": "",
+        "urlType": "url"
+      },
+      {
+        "name": "version",
+        "default": 1
+      },
+      {
+        "name": "accentColor",
+        "default": "#FF1A75"
+      },
+      {
+        "name": "alignment",
+        "default": "center",
+        "values": [
+          "left",
+          "center",
+          "right"
+        ]
+      },
+      {
+        "name": "backgroundColor",
+        "default": "#000000",
+        "values": [
+          "white",
+          "grey",
+          "blue",
+          "green",
+          "yellow",
+          "red",
+          "pink",
+          "purple",
+          "accent"
+        ]
+      },
+      {
+        "name": "backgroundImageWidth",
+        "default": null
+      },
+      {
+        "name": "backgroundImageHeight",
+        "default": null
+      },
+      {
+        "name": "backgroundSize",
+        "default": "cover"
+      },
+      {
+        "name": "textColor",
+        "default": "#FFFFFF"
+      },
+      {
+        "name": "buttonColor",
+        "default": "#ffffff"
+      },
+      {
+        "name": "buttonTextColor",
+        "default": "#000000"
+      },
+      {
+        "name": "layout",
+        "default": "full",
+        "values": [
+          "regular"
+        ]
+      },
+      {
+        "name": "swapped",
+        "default": false
+      }
+    ],
+    "oxBlock": "HEADER"
+  },
+  "html": {
+    "nodeType": "html",
+    "file": "html/HtmlNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/html/HtmlNode.js",
+    "hasVisibility": true,
+    "properties": [
+      {
+        "name": "html",
+        "default": "",
+        "urlType": "html",
+        "wordCount": true
+      }
+    ],
+    "oxBlock": "HTML"
+  },
+  "image": {
+    "nodeType": "image",
+    "file": "image/ImageNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/image/ImageNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "src",
+        "default": "",
+        "urlType": "url"
+      },
+      {
+        "name": "caption",
+        "default": "",
+        "urlType": "html",
+        "wordCount": true
+      },
+      {
+        "name": "title",
+        "default": ""
+      },
+      {
+        "name": "alt",
+        "default": ""
+      },
+      {
+        "name": "cardWidth",
+        "default": "regular",
+        "values": [
+          "regular",
+          "wide",
+          "full"
+        ]
+      },
+      {
+        "name": "width",
+        "default": null
+      },
+      {
+        "name": "height",
+        "default": null
+      },
+      {
+        "name": "href",
+        "default": "",
+        "urlType": "url"
+      }
+    ]
+  },
+  "markdown": {
+    "nodeType": "markdown",
+    "file": "markdown/MarkdownNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/markdown/MarkdownNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "markdown",
+        "default": "",
+        "urlType": "markdown",
+        "wordCount": true
+      }
+    ]
+  },
+  "product": {
+    "nodeType": "product",
+    "file": "product/ProductNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/product/ProductNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "productImageSrc",
+        "default": "",
+        "urlType": "url"
+      },
+      {
+        "name": "productImageWidth",
+        "default": null
+      },
+      {
+        "name": "productImageHeight",
+        "default": null
+      },
+      {
+        "name": "productTitle",
+        "default": "",
+        "urlType": "html",
+        "wordCount": true
+      },
+      {
+        "name": "productDescription",
+        "default": "",
+        "urlType": "html",
+        "wordCount": true
+      },
+      {
+        "name": "productRatingEnabled",
+        "default": false
+      },
+      {
+        "name": "productStarRating",
+        "default": 5
+      },
+      {
+        "name": "productButtonEnabled",
+        "default": false
+      },
+      {
+        "name": "productButton",
+        "default": ""
+      },
+      {
+        "name": "productUrl",
+        "default": ""
+      }
+    ],
+    "oxBlock": "PRODUCT"
+  },
+  "signup": {
+    "nodeType": "signup",
+    "file": "signup/SignupNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/signup/SignupNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "alignment",
+        "default": "left",
+        "values": [
+          "left",
+          "center",
+          "right"
+        ]
+      },
+      {
+        "name": "backgroundColor",
+        "default": "#F0F0F0",
+        "values": [
+          "white",
+          "grey",
+          "blue",
+          "green",
+          "yellow",
+          "red",
+          "pink",
+          "purple",
+          "accent"
+        ]
+      },
+      {
+        "name": "backgroundImageSrc",
+        "default": ""
+      },
+      {
+        "name": "backgroundSize",
+        "default": "cover"
+      },
+      {
+        "name": "textColor",
+        "default": ""
+      },
+      {
+        "name": "buttonColor",
+        "default": "accent"
+      },
+      {
+        "name": "buttonTextColor",
+        "default": "#FFFFFF"
+      },
+      {
+        "name": "buttonText",
+        "default": "Subscribe"
+      },
+      {
+        "name": "disclaimer",
+        "default": "",
+        "wordCount": true
+      },
+      {
+        "name": "header",
+        "default": "",
+        "wordCount": true
+      }
+    ],
+    "oxBlock": "SIGNUP"
+  },
+  "toggle": {
+    "nodeType": "toggle",
+    "file": "toggle/ToggleNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/toggle/ToggleNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "heading",
+        "default": "",
+        "urlType": "html",
+        "wordCount": true
+      },
+      {
+        "name": "content",
+        "default": "",
+        "urlType": "html",
+        "wordCount": true
+      }
+    ],
+    "oxBlock": "TOGGLE"
+  },
+  "transistor": {
+    "nodeType": "transistor",
+    "file": "transistor/TransistorNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/transistor/TransistorNode.js",
+    "hasVisibility": true,
+    "properties": [
+      {
+        "name": "accentColor",
+        "default": ""
+      },
+      {
+        "name": "backgroundColor",
+        "default": "",
+        "values": [
+          "white",
+          "grey",
+          "blue",
+          "green",
+          "yellow",
+          "red",
+          "pink",
+          "purple",
+          "accent"
+        ]
+      }
+    ],
+    "oxBlock": "TRANSISTOR"
+  },
+  "video": {
+    "nodeType": "video",
+    "file": "video/VideoNode.js",
+    "github": "https://github.com/TryGhost/Koenig/blob/main/packages/kg-default-nodes/lib/nodes/video/VideoNode.js",
+    "hasVisibility": false,
+    "properties": [
+      {
+        "name": "src",
+        "default": "",
+        "urlType": "url"
+      },
+      {
+        "name": "caption",
+        "default": "",
+        "urlType": "html",
+        "wordCount": true
+      },
+      {
+        "name": "fileName",
+        "default": ""
+      },
+      {
+        "name": "mimeType",
+        "default": ""
+      },
+      {
+        "name": "width",
+        "default": null
+      },
+      {
+        "name": "height",
+        "default": null
+      },
+      {
+        "name": "duration",
+        "default": 0
+      },
+      {
+        "name": "thumbnailSrc",
+        "default": "",
+        "urlType": "url"
+      },
+      {
+        "name": "customThumbnailSrc",
+        "default": "",
+        "urlType": "url"
+      },
+      {
+        "name": "thumbnailWidth",
+        "default": null
+      },
+      {
+        "name": "thumbnailHeight",
+        "default": null
+      },
+      {
+        "name": "cardWidth",
+        "default": "regular",
+        "values": [
+          "regular",
+          "wide",
+          "full"
+        ]
+      },
+      {
+        "name": "loop",
+        "default": false
+      }
+    ],
+    "oxBlock": "VIDEO"
+  }
+}

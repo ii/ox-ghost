@@ -1,0 +1,22 @@
+#+TITLE: New Card Test
+
+* Email CTA
+
+#+BEGIN_EMAIL-CTA :segment "status:free" :buttonText "Upgrade Now" :buttonUrl "https://example.com/upgrade"
+Exclusive content awaits! Upgrade to a paid membership.
+#+END_EMAIL-CTA
+
+* Markdown Card
+
+#+BEGIN_MARKDOWN
+# Markdown Heading
+
+Some **bold** and *italic* text.
+
+- List item 1
+- List item 2
+
+```javascript
+console.log("Hello!");
+```
+#+END_MARKDOWN

@@ -1,0 +1,254 @@
+#+TITLE: Ghost Post Template
+#+AUTHOR: Your Name
+#+DATE: 2026-01-30
+#+DESCRIPTION: Brief excerpt for post preview
+
+# Ghost Metadata (optional)
+#+GHOST_SLUG: your-post-slug
+#+GHOST_STATUS: draft
+#+GHOST_VISIBILITY: public
+#+GHOST_TAGS: tag1, tag2
+#+GHOST_IMAGE: https://example.com/feature-image.jpg
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+Opening paragraph goes here. This maps to a =paragraph= node containing =text= nodes.
+
+* Main Content
+
+** Block-Level Elements
+
+*** Paragraphs
+
+Regular text creates paragraph nodes. Multiple paragraphs are separate nodes.
+
+A blank line between text creates a new paragraph.
+
+*** Headings
+
+Org headings (=*=, =**=, =***=) map to Ghost =heading= nodes with tags h2-h6.
+(The document title becomes h1 via Ghost metadata, not in the Lexical content.)
+
+*** Lists
+
+Unordered list (=list= node with =listType: "bullet"=):
+- First item (=listitem= node)
+- Second item
+- Third item
+
+Ordered list (=listType: "number"=):
+1. First item
+2. Second item
+3. Third item
+
+Nested lists (=listitem= contains child =list=):
+- Parent item
+  - Nested item
+  - Another nested
+- Back to parent
+
+*** Blockquotes
+
+#+BEGIN_QUOTE
+This maps to a =quote= node.
+Can contain multiple lines with linebreaks.
+#+END_QUOTE
+
+*** Pull Quotes (Aside)
+
+#+BEGIN_ASIDE
+This maps to an =aside= node.
+Visually distinct from regular quotes.
+#+END_ASIDE
+
+** Inline Elements
+
+*** Text Formatting
+
+These map to =text= nodes with format bitmask:
+
+- *Bold text* (format: 1)
+- /Italic text/ (format: 2)
+- +Strikethrough+ (format: 4)
+- _Underlined_ (format: 8)
+- =Inline code= (format: 16)
+- *_Bold and underline_* (format: 9 = 1+8)
+- */Bold italic/* (format: 3 = 1+2)
+
+*** Links
+
+Regular links map to =link= nodes containing =text=:
+
+[[https://ghost.org][Ghost Website]]
+
+[[https://example.com]]
+
+*** Line Breaks
+
+Use =\\= for soft line breaks within a paragraph:\\
+This stays in the same paragraph but on a new line.
+
+(Note: linebreaks only valid in paragraph and quote blocks)
+
+** Card Elements (DecoratorNodes)
+
+*** Images
+
+Images from links:
+
+[[https://example.com/image.jpg]]
+
+With alt text:
+[[https://example.com/image.jpg][Alt text description]]
+
+With attributes:
+#+ATTR_LEXICAL: :cardWidth wide
+[[https://example.com/image.jpg]]
+
+*** Code Blocks
+
+#+BEGIN_SRC javascript
+// Maps to codeblock node
+function hello() {
+  console.log("Hello, Ghost!");
+}
+#+END_SRC
+
+#+BEGIN_SRC python
+# Language is captured in the node
+def greet():
+    print("Hello from Python!")
+#+END_SRC
+
+*** Callouts
+
+#+BEGIN_CALLOUT :emoji "💡" :color blue
+This is a callout box. Great for tips, warnings, or highlighting important information.
+#+END_CALLOUT
+
+#+BEGIN_CALLOUT :emoji "⚠️" :color yellow
+Warning callout with different color.
+#+END_CALLOUT
+
+*** Toggle (Collapsible)
+
+#+BEGIN_TOGGLE :heading "Click to expand"
+Hidden content goes here.
+
+Can contain multiple paragraphs and even code:
+
+#+BEGIN_SRC bash
+echo "Inside a toggle"
+#+END_SRC
+#+END_TOGGLE
+
+*** Buttons
+
+#+BEGIN_BUTTON :url "https://ghost.org" :alignment center
+Click Me
+#+END_BUTTON
+
+*** Bookmarks
+
+#+BEGIN_BOOKMARK :url "https://ghost.org" :title "Ghost Publishing" :description "Professional publishing platform"
+Ghost
+#+END_BOOKMARK
+
+*** Embeds
+
+#+BEGIN_EMBED :url "https://www.youtube.com/watch?v=VIDEO_ID"
+YouTube Video Title
+#+END_EMBED
+
+*** Raw HTML
+
+#+BEGIN_EXPORT html
+<div class="custom-element">
+  <p>Raw HTML content</p>
+</div>
+#+END_EXPORT
+
+*** Horizontal Rule
+
+-----
+
+*** Dividers
+
+Use five or more dashes for a horizontal rule (=horizontalrule= node).
+
+** Membership Cards
+
+*** Signup Form
+
+#+BEGIN_SIGNUP :layout wide :buttonText "Subscribe"
+Join our newsletter
+#+END_SIGNUP
+
+*** Paywall Marker
+
+#+BEGIN_PAYWALL
+#+END_PAYWALL
+
+Content below this marker requires membership.
+
+*** Email-Only Content
+
+#+BEGIN_EMAIL
+This content only appears in email newsletters, not on the web.
+#+END_EMAIL
+
+** Media Cards
+
+*** Video
+
+#+BEGIN_VIDEO :src "https://example.com/video.mp4" :thumbnailSrc "https://example.com/thumb.jpg"
+Video caption
+#+END_VIDEO
+
+*** Audio
+
+#+BEGIN_AUDIO :src "https://example.com/audio.mp3" :duration 180
+Episode Title
+#+END_AUDIO
+
+*** File Download
+
+#+BEGIN_FILE :src "https://example.com/document.pdf" :fileName "document.pdf"
+Download this PDF
+#+END_FILE
+
+*** Gallery
+
+#+BEGIN_GALLERY :images "img1.jpg, img2.jpg, img3.jpg"
+#+END_GALLERY
+
+** Advanced Cards
+
+*** Call to Action
+
+#+BEGIN_CTA :layout immersive :url "https://example.com" :buttonText "Learn More" :backgroundColor grey
+Promotional text for your CTA.
+#+END_CTA
+
+*** Product Card
+
+#+BEGIN_PRODUCT :url "https://shop.example.com" :buttonText "Buy Now"
+Product Name
+#+END_PRODUCT
+
+*** Header Card
+
+#+BEGIN_HEADER :size large
+Hero Section Title
+#+END_HEADER
+
+* Conclusion
+
+Final thoughts wrap up the post.
+
+# Local Variables:
+# org-export-with-toc: nil
+# End:
