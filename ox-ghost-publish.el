@@ -52,6 +52,14 @@ If nil, looks for ghost.js in the ox-ghost directory."
 
 ;;;; Utility Functions
 
+(defun ox-ghost--ghost-type ()
+  "Get the Ghost content type from #+GHOST_TYPE header.
+Returns \"page\" if set to page, \"post\" otherwise."
+  (let ((type (ox-ghost--get-header "GHOST_TYPE")))
+    (if (and type (string-equal (downcase type) "page"))
+        "page"
+      "post")))
+
 (defun ghost-publish--find-script ()
   "Find ghost.js script path.
 Checks `ghost-publish-script', then the package directory."
@@ -468,30 +476,34 @@ After successful publish, syncs Ghost metadata back to org headers."
     (require 'ox-ghost)
     (org-lexical-export-for-ghost)
     ;; Publish via ghost.js with --with-metadata to apply excerpt, tags, etc.
-    (let* ((temp-response (make-temp-file "ghost-response-" nil ".json"))
-           (cmd (format "cd %s && node ghost.js post get-create-response %s %s > %s 2>&1"
+    (let* ((ghost-type (ox-ghost--ghost-type))
+           (temp-response (make-temp-file "ghost-response-" nil ".json"))
+           (cmd (format "cd %s && node ghost.js %s get-create-response %s %s > %s 2>&1"
                         (ghost-publish--script-dir)
+                        ghost-type
                         (shell-quote-argument title)
                         (shell-quote-argument json-file)
                         (shell-quote-argument temp-response)))
            ;; Fall back to simple create if get-create-response doesn't exist
            (output (ghost-publish--run-command
-                    (format "cd %s && node ghost.js post create %s %s --with-metadata 2>&1"
+                    (format "cd %s && node ghost.js %s create %s %s --with-metadata 2>&1"
                             (ghost-publish--script-dir)
+                            ghost-type
                             (shell-quote-argument title)
                             (shell-quote-argument json-file)))))
       (if (string-match "https://[^ \n]+" output)
           (let ((url (match-string 0 output)))
-            ;; Try to pull metadata from Ghost for the newly created post
+            ;; Try to pull metadata from Ghost for the newly created post/page
             ;; Extract slug from URL: https://www.ii.coop/slug-here/
             (when (string-match "https://[^/]+/\\([^/]+\\)/?$" url)
               (let ((slug (match-string 1 url)))
                 (condition-case err
                     (progn
-                      ;; Fetch full post data and write to metadata file
+                      ;; Fetch full post/page data and write to metadata file
                       (let ((post-json (ghost-publish--run-command
-                                        (format "cd %s && node ghost.js post get %s 2>&1"
+                                        (format "cd %s && node ghost.js %s get %s 2>&1"
                                                 (ghost-publish--script-dir)
+                                                ghost-type
                                                 (shell-quote-argument slug)))))
                         (with-temp-file metadata-file
                           (insert post-json))
@@ -524,19 +536,22 @@ After successful update, syncs Ghost metadata back to org headers."
     (require 'ox-ghost)
     (org-lexical-export-for-ghost)
     ;; Update via ghost.js with --with-metadata to apply excerpt, tags, etc.
-    (let ((output (ghost-publish--run-command
-                   (format "cd %s && node ghost.js post update %s %s --with-metadata 2>&1"
-                           (ghost-publish--script-dir)
-                           (shell-quote-argument identifier)
-                           (shell-quote-argument json-file)))))
+    (let* ((ghost-type (ox-ghost--ghost-type))
+           (output (ghost-publish--run-command
+                    (format "cd %s && node ghost.js %s update %s %s --with-metadata 2>&1"
+                            (ghost-publish--script-dir)
+                            ghost-type
+                            (shell-quote-argument identifier)
+                            (shell-quote-argument json-file)))))
       (if (string-match "https://[^ \n]+" output)
           (let ((url (match-string 0 output)))
             ;; Fetch updated metadata and sync back
             (condition-case err
                 (progn
                   (let ((post-json (ghost-publish--run-command
-                                    (format "cd %s && node ghost.js post get %s 2>&1"
+                                    (format "cd %s && node ghost.js %s get %s 2>&1"
                                             (ghost-publish--script-dir)
+                                            ghost-type
                                             (shell-quote-argument identifier)))))
                     (with-temp-file metadata-file
                       (insert post-json))
@@ -736,10 +751,12 @@ Uses GHOST_ID or GHOST_SLUG from current buffer to identify the post."
     (unless (or id slug)
       (user-error "No GHOST_ID or GHOST_SLUG found in buffer. Publish first"))
     (let* ((identifier (or id slug))
+           (ghost-type (ox-ghost--ghost-type))
            (script-dir (ghost-publish--script-dir))
            (temp-file (make-temp-file "ghost-metadata-" nil ".json"))
-           (cmd (format "cd %s && node ghost.js post get %s 2>&1"
+           (cmd (format "cd %s && node ghost.js %s get %s 2>&1"
                         script-dir
+                        ghost-type
                         (shell-quote-argument identifier)))
            (output (ghost-publish--run-command cmd)))
       ;; Write output to temp file (it should be JSON)
@@ -772,9 +789,11 @@ Displays diff of local metadata vs Ghost's current state."
     (unless (or id slug)
       (user-error "No GHOST_ID or GHOST_SLUG found. Publish first"))
     (let* ((identifier (or id slug))
+           (ghost-type (ox-ghost--ghost-type))
            (script-dir (ghost-publish--script-dir))
-           (cmd (format "cd %s && node ghost.js post get %s 2>&1"
+           (cmd (format "cd %s && node ghost.js %s get %s 2>&1"
                         script-dir
+                        ghost-type
                         (shell-quote-argument identifier)))
            (output (ghost-publish--run-command cmd))
            (local-headers '(("GHOST_ID" . id)

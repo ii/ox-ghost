@@ -507,6 +507,22 @@ This enables a true round-trip workflow:
 
 The org file becomes your source of truth while staying in sync with Ghost.
 
+** Pages vs Posts
+
+By default, =ghost-publish= and =ghost-update= create/update Ghost *posts*. To publish a Ghost *page* instead, add:
+
+#+BEGIN_SRC org
+,#+GHOST_TYPE: page
+#+END_SRC
+
+All commands (=ghost-publish=, =ghost-update=, =ghost-pull-metadata=, =ghost-status=) automatically route to the correct Ghost API based on this header.
+
+| Header Value | API Used                       |
+|--------------+--------------------------------|
+| (not set)    | =ghost.js post create/update=  |
+| =post=       | =ghost.js post create/update=  |
+| =page=       | =ghost.js page create/update=  |
+
 * Resources
 
 - [[https://ghost.org/docs/editor/][Ghost Editor Documentation]]
