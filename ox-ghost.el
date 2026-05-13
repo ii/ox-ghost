@@ -280,7 +280,9 @@ Handles URLs with colons and multi-word values properly."
       ;; - A quoted string: \"...\"
       ;; - A URL: https://... (up to next whitespace+colon-word)
       ;; - A single word
-      (while (string-match ":\\([a-zA-Z_]+\\)\\s-+\\(\"[^\"]*\"\\|[^[:space:]]+\\(?:[[:space:]]+[^:[:space:]][^[:space:]]*\\)*\\)" str pos)
+      ;; Keys may contain letters, digits, underscores, and hyphens — e.g.
+      ;; :start-at, :idle-time-limit, :terminal-font-family.
+      (while (string-match ":\\([-a-zA-Z0-9_]+\\)\\s-+\\(\"[^\"]*\"\\|[^[:space:]]+\\(?:[[:space:]]+[^:[:space:]][^[:space:]]*\\)*\\)" str pos)
         (let* ((key (intern (concat ":" (match-string 1 str))))
                (val-raw (match-string 2 str))
                ;; Strip quotes if present
