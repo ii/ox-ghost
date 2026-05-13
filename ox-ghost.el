@@ -1063,6 +1063,78 @@ layout (split/full for v2), backgroundImageSrc, subheader, buttonText, buttonUrl
   (ox-ghost--node "transistor"
     `(episodeUrl . ,(or (plist-get attr :url) ""))))
 
+;;; ----------------------------------------------------------------------------
+;;; Asciinema Player Card
+;;; ----------------------------------------------------------------------------
+
+(defun ox-ghost--card-asciinema (attr text)
+  "Create asciinema player card from ATTR.
+Renders as an HTML card with a div that the Ghost theme's JS
+initializes as an asciinema-player instance.
+
+Required:
+  :src                  URL to .cast file
+
+Always emitted (with sensible defaults):
+  :speed                playback speed multiplier (default 1)
+  :theme                color theme (default \"asciinema\";
+                        also: dracula, monokai, nord, solarized-dark)
+  :cols                 terminal columns (default 120)
+  :rows                 terminal rows (default 30)
+  :title                shown as a label above the player
+
+Optional — emitted only when set:
+  :autoplay             start automatically (true|false)
+  :preload              preload cast data (true|false)
+  :loop                 loop playback (true|false|<count>)
+  :start-at             start position in seconds or HH:MM:SS
+  :idle-time-limit      cap idle time in seconds
+  :poster               initial frame (e.g. \"npt:5\" or data URL)
+  :fit                  width|height|both|none|false
+  :controls             show controls (true|false)
+  :terminal-font-size   e.g. \"small\" or \"15px\"
+  :terminal-font-family CSS font-family stack
+  :terminal-line-height numeric line-height ratio
+  :markers              JSON array of [time, label] markers
+  :pause-on-markers     pause at each marker (true|false)
+
+Usage in org-mode:
+  #+BEGIN_ASCIINEMA :src URL :cols 82 :rows 66 :theme dracula :autoplay true :loop true
+  #+END_ASCIINEMA"
+  (let* ((src (or (plist-get attr :src) ""))
+         (speed (or (plist-get attr :speed) "1"))
+         (theme (or (plist-get attr :theme) "asciinema"))
+         (title (or (plist-get attr :title) text ""))
+         (cols (or (plist-get attr :cols) "120"))
+         (rows (or (plist-get attr :rows) "30"))
+         (player-id (format "asciinema-player-%d" (random 10000)))
+         (title-html (if (and title (not (string-empty-p title)))
+                         (format "<p style=\"margin-bottom: 0.5em; font-weight: 600;\">%s</p>\n" title)
+                       ""))
+         ;; Org block keyword → asciinema-player data-attr name.
+         ;; Only emitted when the keyword is set in the #+BEGIN_ASCIINEMA line.
+         (optional-attrs '((:autoplay              . "autoplay")
+                           (:preload               . "preload")
+                           (:loop                  . "loop")
+                           (:start-at              . "start-at")
+                           (:idle-time-limit       . "idle-time-limit")
+                           (:poster                . "poster")
+                           (:fit                   . "fit")
+                           (:controls              . "controls")
+                           (:terminal-font-size    . "terminal-font-size")
+                           (:terminal-font-family  . "terminal-font-family")
+                           (:terminal-line-height  . "terminal-line-height")
+                           (:markers               . "markers")
+                           (:pause-on-markers      . "pause-on-markers")))
+         (extras (mapconcat
+                  (lambda (pair)
+                    (let ((v (plist-get attr (car pair))))
+                      (if v (format " data-%s=\"%s\"" (cdr pair) v) "")))
+                  optional-attrs ""))
+         (html (format "%s<div id=\"%s\" class=\"asciinema-player-container\" data-src=\"%s\" data-speed=\"%s\" data-theme=\"%s\" data-cols=\"%s\" data-rows=\"%s\"%s></div>"
+                       title-html player-id src speed theme cols rows extras)))
+    (ox-ghost--card-html html)))
+
 ;;; ============================================================================
 ;;; Raw Content Cards
 ;;; ============================================================================
@@ -1229,6 +1301,7 @@ Handles errors gracefully by returning a placeholder instead of crashing."
       ("PAYWALL"    (ox-ghost--card-paywall))
       ;; Integration Cards
       ("TRANSISTOR" (ox-ghost--card-transistor attr))
+      ("ASCIINEMA"  (ox-ghost--card-asciinema attr text))
       ;; Raw Content
       ("MARKDOWN"   (ox-ghost--card-markdown text))
       ;; Special Handling
